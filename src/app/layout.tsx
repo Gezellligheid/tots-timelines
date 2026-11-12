@@ -12,7 +12,6 @@ export const metadata: Metadata = {
   description: "Track your newborn's feeding, sleep, diapers and growth, beautifully.",
   applicationName: "Tots & Timelines",
   appleWebApp: { capable: true, title: "Tots & Timelines", statusBarStyle: "default" },
-  icons: { apple: "/icons/180" },
 };
 export const viewport: Viewport = {
   width: "device-width",
