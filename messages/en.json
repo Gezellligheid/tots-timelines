@@ -491,7 +491,9 @@
     "outroTitle": "Here's to the next 3 months",
     "outroBody": "Keep logging. Your next Wrapped arrives when {name} turns {n} months.",
     "done": "Done",
-    "replay": "Watch again"
+    "replay": "Watch again",
+    "momentsKeep": "moments worth keeping",
+    "milestonesLead": "Little firsts you'll never forget"
   },
   "feedReminder": {
     "title": "Remind you for the next feed?",

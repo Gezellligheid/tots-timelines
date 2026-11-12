@@ -14,6 +14,7 @@ import { usePeriodLabel } from "@/components/WrappedGate";
 import { computeWrapped, periodBounds, wrappedKey, type GrowthPoint, type WrappedSummary } from "@/lib/wrapped";
 import { ageMonths, loadGrowth, percentileOf, sexKey, zScore, type GrowthMetric } from "@/lib/growth";
 import { fmtDur } from "@/lib/stats";
+import { ageText } from "@/lib/format";
 import { fmtLength, fmtWeight } from "@/lib/units";
 import type { AccentName, Baby, EventDoc, Units } from "@/lib/types";
 
@@ -225,27 +226,117 @@ function Growth({ s, baby, units }: { s: WrappedSummary; baby: Baby; units: Unit
   );
 }
 
+/** Photo for a moment: private R2 photo, or an inline demo image on localhost. */
+function MomentImage({ m, className = "" }: { m: WrappedSummary["moments"][number]; className?: string }) {
+  if (m.photoKey) return <PhotoImage photoKey={m.photoKey} className={className} />;
+  if (m.img) {
+    return (
+      <MaskReveal className={`overflow-hidden ${className}`} duration={0.9}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={m.img} alt="" className="h-full w-full object-cover" />
+      </MaskReveal>
+    );
+  }
+  return null;
+}
+const hasPhoto = (m: WrappedSummary["moments"][number]) => !!(m.photoKey || m.img);
+
+/** Pick up to k items spread evenly across the list (first and last included). */
+function spread<T>(arr: T[], k: number): T[] {
+  if (arr.length <= k) return arr;
+  return Array.from({ length: k }, (_, i) => arr[Math.round((i * (arr.length - 1)) / (k - 1))]);
+}
+
 function Moments({ s }: { s: WrappedSummary }) {
   const t = useTranslations("wrapped");
-  const title = useMomentTitleKey();
-  const photos = s.moments.filter((m) => m.photoKey).slice(-4);
-  const list = s.moments.filter((m) => m.milestone || m.title).slice(-4);
+  const photos = spread(s.moments.filter(hasPhoto), 4);
   return (
     <Stage tone="sky">
       <Kicker>{t("momentsTitle")}</Kicker>
+      <Big value={s.moments.length} />
+      <Line>{t("momentsKeep")}</Line>
       {photos.length > 0 && (
-        <div className="mb-5 grid grid-cols-2 gap-3">
+        <div className="mt-6 grid grid-cols-2 gap-3">
           {photos.map((m, i) => (
-            <MaskReveal key={m.id} origin={i % 2 ? "100% 0%" : "0% 0%"} delay={0.2 + i * 0.2} duration={0.9}>
-              <PhotoImage photoKey={m.photoKey!} className="aspect-square rounded-[24px]" />
+            <MaskReveal key={m.id} origin={i % 2 ? "100% 0%" : "0% 0%"} delay={0.8 + i * 0.2} duration={0.9}>
+              <MomentImage m={m} className="aspect-square rounded-[24px]" />
             </MaskReveal>
           ))}
         </div>
       )}
-      {s.milestones > 0 && <Line delay={0.6} className="!mt-0 !text-3xl !font-extrabold">{t("momentsSub", { n: s.milestones })}</Line>}
-      <div className="mt-4 space-y-2">
+    </Stage>
+  );
+}
+
+/** One full-screen memory: the photo fills the screen and slowly zooms, with the story on top. */
+function MemorySlide({ m, baby }: { m: WrappedSummary["moments"][number]; baby: Baby }) {
+  const tm = useTranslations("moments");
+  const tAge = useTranslations("age");
+  const locale = useLocale();
+  const title = useMomentTitleKey();
+  const isMs = !!m.milestone;
+  const when = new Date(m.t);
+  return (
+    <div className="relative h-full overflow-hidden bg-black text-white">
+      <motion.div className="absolute inset-0" initial={{ scale: 1.02 }} animate={{ scale: 1.14 }} transition={{ duration: SLIDE_MS / 1000 + 1.5, ease: "linear" }}>
+        <MomentImage m={m} className="absolute inset-0" />
+      </motion.div>
+      <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,.78), rgba(0,0,0,.12) 55%, rgba(0,0,0,.28))" }} />
+      <div className="absolute inset-x-0 bottom-0 px-8 pb-16">
+        <motion.span initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-white/85 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-black">
+          <Icon name={isMs ? "star" : "heart"} size={12} />
+          {isMs ? tm("badgeMilestone") : tm("badgeMemory")}
+        </motion.span>
+        <h2 className="text-[38px] font-extrabold leading-[1.05] tracking-tight"><RevealText text={title(m)} delay={0.6} /></h2>
+        {m.note && <Line delay={1.1} className="!text-base !font-medium text-white/85">{m.note}</Line>}
+        <Line delay={1.3} className="!text-sm !font-semibold text-white/70">
+          {when.toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" })} · {ageText(baby.birthDate, tAge, when)}
+        </Line>
+      </div>
+    </div>
+  );
+}
+
+/** A memory without a photo: the note becomes a big quote. */
+function QuoteSlide({ m, baby, tone }: { m: WrappedSummary["moments"][number]; baby: Baby; tone: Tone }) {
+  const tm = useTranslations("moments");
+  const tAge = useTranslations("age");
+  const locale = useLocale();
+  const title = useMomentTitleKey();
+  const when = new Date(m.t);
+  return (
+    <Stage tone={tone}>
+      <Kicker icon="heart">{tm("badgeMemory")}</Kicker>
+      <motion.span initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 0.25, scale: 1 }} transition={{ delay: 0.2, type: "spring" }} className="absolute left-7 top-32 text-[140px] font-extrabold leading-none">“</motion.span>
+      <RevealText as="p" className="relative text-[32px] font-extrabold leading-[1.15] tracking-tight" text={m.note ?? ""} delay={0.4} />
+      <Line delay={1.4} className="!text-lg">{title(m)}</Line>
+      <Line delay={1.6} className="!mt-1 !text-sm !font-semibold opacity-60">
+        {when.toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" })} · {ageText(baby.birthDate, tAge, when)}
+      </Line>
+    </Stage>
+  );
+}
+
+/** All the milestones in order, like a little timeline. */
+function MilestoneTimeline({ s, baby }: { s: WrappedSummary; baby: Baby }) {
+  const t = useTranslations("wrapped");
+  const tAge = useTranslations("age");
+  const locale = useLocale();
+  const title = useMomentTitleKey();
+  const list = s.moments.filter((m) => m.milestone).slice(-6);
+  return (
+    <Stage tone="mint">
+      <Kicker>{t("momentsSub", { n: list.length })}</Kicker>
+      <h2 className="text-[34px] font-extrabold leading-[1.1] tracking-tight"><RevealText text={t("milestonesLead")} delay={0.2} /></h2>
+      <div className="relative mt-8 space-y-5 border-l-2 border-ink/20 pl-6">
         {list.map((m, i) => (
-          <Chipline key={m.id} delay={0.9 + i * 0.2}><span className="inline-flex items-center gap-2"><Icon name="star" size={14} />{title(m)}</span></Chipline>
+          <motion.div key={m.id} className="relative" initial={{ clipPath: "inset(0 100% 0 0 round 16px)" }} animate={{ clipPath: "inset(0 0% 0 0 round 16px)" }} transition={{ delay: 0.6 + i * 0.3, duration: 0.8, ease: EASE }}>
+            <span className="absolute -left-[33px] top-1.5 h-3.5 w-3.5 rounded-full bg-ink" />
+            <p className="text-xl font-extrabold leading-tight">{title(m)}</p>
+            <p className="text-sm font-semibold opacity-60">
+              {new Date(m.t).toLocaleDateString(locale, { day: "numeric", month: "short" })} · {ageText(baby.birthDate, tAge, new Date(m.t))}
+            </p>
+          </motion.div>
         ))}
       </div>
     </Stage>
@@ -270,7 +361,7 @@ function Outro({ baby, n, onDone, onReplay }: { baby: Baby; n: number; onDone: (
 }
 
 /* ---------------- the story ---------------- */
-export function WrappedStory({ n }: { n: number }) {
+export function WrappedStory({ n, demo }: { n: number; demo?: WrappedSummary }) {
   const t = useTranslations("wrapped");
   const router = useRouter();
   const label = usePeriodLabel();
@@ -281,6 +372,7 @@ export function WrappedStory({ n }: { n: number }) {
   const [layer, setLayer] = useState(1);
   const [origin, setOrigin] = useState("50% 100%");
   const units = userDoc?.units ?? "metric";
+  const exit = () => router.replace(demo ? "/profile" : "/home");
 
   useEffect(() => {
     if (authReady && !user) router.replace("/");
@@ -290,6 +382,10 @@ export function WrappedStory({ n }: { n: number }) {
   const babyId = baby?.id;
   useEffect(() => {
     if (!baby) return;
+    if (demo) {
+      setSummary(demo);
+      return;
+    }
     let live = true;
     (async () => {
       const ref = doc(db, "babies", baby.id, "wraps", String(n));
@@ -309,7 +405,7 @@ export function WrappedStory({ n }: { n: number }) {
   // Opening it counts as seen
   const seenSet = useRef(false);
   useEffect(() => {
-    if (!summary || !baby || seenSet.current) return;
+    if (!summary || !baby || seenSet.current || demo) return;
     seenSet.current = true;
     void patchUser({ wrappedSeen: { [wrappedKey(baby.id, n)]: Date.now() } });
   }, [summary, baby, n, patchUser]);
@@ -323,8 +419,14 @@ export function WrappedStory({ n }: { n: number }) {
     if (summary.sleep.totalH > 1) list.push({ id: "sleep", node: <Sleep s={summary} /> });
     if (summary.sleep.totalH > 1 || summary.feeds.count) list.push({ id: "rhythm", node: <Rhythm s={summary} /> });
     if (summary.growth.end) list.push({ id: "growth", node: <Growth s={summary} baby={baby} units={units} /> });
-    if (summary.moments.length) list.push({ id: "moments", node: <Moments s={summary} /> });
-    list.push({ id: "outro", node: <Outro baby={baby} n={n} onDone={() => router.replace("/home")} onReplay={() => go(0)} /> });
+    const ms = summary.moments;
+    if (ms.length) {
+      list.push({ id: "moments", node: <Moments s={summary} /> });
+      spread(ms.filter(hasPhoto), 5).forEach((m) => list.push({ id: `mem-${m.id}`, node: <MemorySlide m={m} baby={baby} /> }));
+      ms.filter((m) => !hasPhoto(m) && m.note).slice(-2).forEach((m, i) => list.push({ id: `quote-${m.id}`, node: <QuoteSlide m={m} baby={baby} tone={i ? "mint" : "peach"} /> }));
+      if (ms.filter((m) => m.milestone).length >= 2) list.push({ id: "timeline", node: <MilestoneTimeline s={summary} baby={baby} /> });
+    }
+    list.push({ id: "outro", node: <Outro baby={baby} n={n} onDone={() => exit()} onReplay={() => go(0)} /> });
     return list;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [summary, baby, n, units]);
@@ -344,7 +446,7 @@ export function WrappedStory({ n }: { n: number }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i, slides.length]);
 
-  if (err) return <div className="grid min-h-dvh place-items-center bg-lavender p-8 text-center font-bold">{t("error")}<button className="pill-btn mt-6" onClick={() => router.replace("/home")}>{t("close")}</button></div>;
+  if (err) return <div className="grid min-h-dvh place-items-center bg-lavender p-8 text-center font-bold">{t("error")}<button className="pill-btn mt-6" onClick={() => exit()}>{t("close")}</button></div>;
   if (!summary || !baby) {
     return (
       <div className="grid min-h-dvh place-items-center bg-lavender text-center">
@@ -356,18 +458,21 @@ export function WrappedStory({ n }: { n: number }) {
     );
   }
 
+  const onPhoto = !!slides[i]?.id.startsWith("mem-");
+
   return (
     <div className="fixed inset-0 z-50 mx-auto max-w-[520px] overflow-hidden bg-bg text-ink" onClick={(e) => { const x = e.clientX / window.innerWidth; go(x < 0.3 ? i - 1 : i + 1, x); }}>
       <div className="absolute inset-x-0 top-0 z-[200] flex items-center gap-3 px-4 safe-t" onClick={(e) => e.stopPropagation()}>
         <div className="flex flex-1 gap-1.5" aria-hidden>
           {slides.map((sl, idx) => (
-            <div key={sl.id} className="h-1.5 flex-1 overflow-hidden rounded-full bg-ink/20">
-              {idx < i && <div className="h-full w-full rounded-full bg-ink" />}
-              {idx === i && <motion.div key={`${i}-${layer}`} className="h-full rounded-full bg-ink" initial={{ width: idx === last ? "100%" : "0%" }} animate={{ width: "100%" }} transition={{ duration: idx === last ? 0.6 : SLIDE_MS / 1000, ease: "linear" }} />}
+            <div key={sl.id} className={`h-1.5 flex-1 overflow-hidden rounded-full ${onPhoto ? "bg-white/30" : "bg-ink/20"}`}>
+              {idx < i && <div className={`h-full w-full rounded-full ${onPhoto ? "bg-white" : "bg-ink"}`} />}
+              {idx === i && <motion.div key={`${i}-${layer}`} className={`h-full rounded-full ${onPhoto ? "bg-white" : "bg-ink"}`} initial={{ width: idx === last ? "100%" : "0%" }} animate={{ width: "100%" }} transition={{ duration: idx === last ? 0.6 : SLIDE_MS / 1000, ease: "linear" }} />}
             </div>
           ))}
         </div>
-        <button className="glass-btn !h-10 !w-10" aria-label={t("close")} onClick={() => router.replace("/home")}><Icon name="close" size={18} /></button>
+        {demo && <span className="on-ink rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider">Demo</span>}
+        <button className="glass-btn !h-10 !w-10" aria-label={t("close")} onClick={() => exit()}><Icon name="close" size={18} /></button>
       </div>
       <p className="sr-only">{label(n)}</p>
 

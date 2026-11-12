@@ -39,7 +39,7 @@ export interface WrappedSummary {
   diapers: { total: number; wet: number; dirty: number };
   sleep: { totalH: number; perDayH: number; longestFirstMs: number; longestLastMs: number; nightPct: number; naps: number; hourly: number[] };
   growth: { start?: GrowthPoint; end?: GrowthPoint };
-  moments: { id: string; t: number; title?: string; milestone?: string; photoKey?: string; note?: string }[];
+  moments: { id: string; t: number; title?: string; milestone?: string; photoKey?: string; img?: string; note?: string }[];
   milestones: number;
   createdAt: number;
 }
@@ -101,7 +101,7 @@ export function computeWrapped(all: EventDoc[], baby: Baby, n: number): WrappedS
       hourly: sleepHourly.map((m) => Math.min(1, m / (days * 60))),
     },
     growth: { start, end },
-    moments: moments.slice(-12).map((e) => ({ id: e.id, t: e.start, title: e.data.title, milestone: e.data.milestone, photoKey: e.photoKey, note: e.note })),
+    moments: moments.slice(-20).map((e) => ({ id: e.id, t: e.start, title: e.data.title, milestone: e.data.milestone, photoKey: e.photoKey, note: e.note })),
     milestones: moments.filter((e) => e.data.milestone).length,
     createdAt: Date.now(),
   });

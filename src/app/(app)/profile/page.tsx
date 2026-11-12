@@ -173,6 +173,17 @@ export default function ProfilePage() {
         ) : (
           <p className="text-sm font-medium text-soft">{t("wrappedEmpty", { name: baby.name })}</p>
         )}
+        {process.env.NODE_ENV !== "production" && (
+          <div className="rounded-[18px] border-2 border-dashed border-line p-3">
+            <p className="mb-2 text-xs font-extrabold uppercase tracking-wider text-soft">Dev only: demo with sample data</p>
+            <div className="flex flex-wrap gap-2">
+              <Link href="/wrapped/demo" className="ghost-btn !h-10 !px-4 !text-sm">Months 1–3</Link>
+              <Link href="/wrapped/demo?n=6" className="ghost-btn !h-10 !px-4 !text-sm">Months 4–6</Link>
+              <Link href="/wrapped/demo?photos=0" className="ghost-btn !h-10 !px-4 !text-sm">No photos</Link>
+              <Link href="/wrapped/demo?gate=1" className="ghost-btn !h-10 !px-4 !text-sm">“Ready” screen</Link>
+            </div>
+          </div>
+        )}
       </Section>
 
       <Section title={t("install")}>

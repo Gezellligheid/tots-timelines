@@ -491,7 +491,9 @@
     "outroTitle": "Op de volgende 3 maanden",
     "outroBody": "Blijf loggen. Je volgende Wrapped komt als {name} {n} maanden wordt.",
     "done": "Klaar",
-    "replay": "Opnieuw bekijken"
+    "replay": "Opnieuw bekijken",
+    "momentsKeep": "momenten om te bewaren",
+    "milestonesLead": "Kleine eerste keertjes om nooit te vergeten"
   },
   "feedReminder": {
     "title": "Herinnering voor de volgende voeding?",
