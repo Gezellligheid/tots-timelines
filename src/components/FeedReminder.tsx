@@ -9,6 +9,7 @@ import { Stepper } from "./forms";
 import { Icon } from "./Icon";
 import { clock } from "@/lib/format";
 import { enablePush, pushState } from "@/lib/push";
+import { ensureDailyReminder } from "@/lib/dailyReminder";
 import { MIN, isRunning } from "@/lib/stats";
 
 const QUICK = [2, 2.5, 3, 3.5, 4];
@@ -46,6 +47,7 @@ function ReminderSheet({ open, onClose, origin }: { open: boolean; onClose: () =
     write(true);
     const ok = await push;
     toast(ok ? t("saved") : tp("remindersBlocked"));
+    if (ok) void ensureDailyReminder(user.uid, baby.id, tp("dailyLabel"));
     setBusy(false);
     onClose();
   };

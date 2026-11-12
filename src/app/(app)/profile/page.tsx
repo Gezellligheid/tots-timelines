@@ -17,6 +17,7 @@ import { uploadPhoto } from "@/lib/media";
 import { nextWrappedAt, wrappedKey } from "@/lib/wrapped";
 import { currentTheme, setTheme } from "@/lib/locale";
 import { enablePush, pushState, resetPush, type PushState } from "@/lib/push";
+import { ensureDailyReminder } from "@/lib/dailyReminder";
 import { ACCENTS, type Baby, type FeedingType, type Reminder } from "@/lib/types";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -84,11 +85,16 @@ export default function ProfilePage() {
     void setDoc(doc(db, "reminders", id), { ownerUid: uid, babyId: baby.id, type, enabled: true, ...base, ...(reminders.find((r) => r.id === id) ?? {}), ...patch, id: undefined }, { merge: true });
   };
 
+  const autoDaily = async () => {
+    if (await ensureDailyReminder(uid!, baby!.id, t("dailyLabel"))) toast(t("dailyAutoOn"));
+  };
+
   const turnOnPush = async () => {
     try {
       const ok = await enablePush(locale);
       setPush(await pushState());
       if (!ok) toast(t("remindersBlocked"));
+      else void autoDaily();
     } catch {
       toast(tc("error"));
     }
@@ -112,6 +118,7 @@ export default function ProfilePage() {
       const ok = await resetPush(locale);
       setPush(await pushState());
       toast(ok ? t("reenabled") : t("remindersBlocked"));
+      if (ok) void autoDaily();
     } catch {
       toast(tc("error"));
     }
