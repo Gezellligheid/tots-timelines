@@ -35,6 +35,17 @@ export default function HomePage() {
   const units = userDoc?.units ?? "metric";
   const describe = useDescribe(units);
 
+  // App shortcuts (long-press the app icon) open /home?log=<type>: show that logging sheet straight away
+  useEffect(() => {
+    try {
+      const p = new URLSearchParams(window.location.search).get("log");
+      if (!p || !["feed", "sleep", "diaper", "growth", "moment"].includes(p)) return;
+      window.history.replaceState(null, "", "/home");
+      setClosing(false);
+      setSheet({ type: p as EventType, origin: { x: window.innerWidth / 2, y: window.innerHeight } });
+    } catch {}
+  }, []);
+
   const running = useMemo(() => events.filter(isRunning), [events]);
   const now = useNow(running.length > 0 || true, running.length ? 1000 : 30000);
 
