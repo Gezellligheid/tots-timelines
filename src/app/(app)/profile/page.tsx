@@ -16,7 +16,7 @@ import { api } from "@/lib/data";
 import { uploadPhoto } from "@/lib/media";
 import { nextWrappedAt, wrappedKey } from "@/lib/wrapped";
 import { currentTheme, setTheme } from "@/lib/locale";
-import { enablePush, pushState, type PushState } from "@/lib/push";
+import { enablePush, pushState, resetPush, type PushState } from "@/lib/push";
 import { ACCENTS, type Baby, type FeedingType, type Reminder } from "@/lib/types";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -101,6 +101,19 @@ export default function ProfilePage() {
       setTestMsg(sent > 0 ? t("testSent", { n: sent }) : t("testNone"));
     } catch {
       setTestMsg(tc("error"));
+    }
+    setTesting(null);
+  };
+
+  const reenable = async () => {
+    setTesting("reenable");
+    setTestMsg(null);
+    try {
+      const ok = await resetPush(locale);
+      setPush(await pushState());
+      toast(ok ? t("reenabled") : t("remindersBlocked"));
+    } catch {
+      toast(tc("error"));
     }
     setTesting(null);
   };
@@ -218,7 +231,13 @@ export default function ProfilePage() {
       <Section title={t("reminders")}>
         {push === "ios-install" && <p className="rounded-[18px] bg-peach p-4 text-sm font-semibold">{t("remindersIos")}</p>}
         {push === "unsupported" && <p className="text-sm text-soft">{t("remindersUnsupported")}</p>}
-        {push === "blocked" && <p className="text-sm font-semibold text-blush-ink">{t("remindersBlocked")}</p>}
+        {push === "blocked" && (
+          <>
+            <p className="text-sm font-semibold text-blush-ink">{t("remindersBlocked")}</p>
+            <p className="text-sm text-soft">{t("unblockHint")}</p>
+            <button className="ghost-btn w-full" onClick={async () => setPush(await pushState())}><Icon name="swap" size={18} />{t("checkAgain")}</button>
+          </>
+        )}
         {push === "ready" && <button className="pill-btn w-full" onClick={turnOnPush}><Icon name="bell" size={20} />{t("remindersOn")}</button>}
         {push === "enabled" && (
           <>
@@ -238,6 +257,14 @@ export default function ProfilePage() {
                 ))}
               </div>
               {testMsg && <p className="text-center text-sm font-bold text-soft">{testMsg}</p>}
+              <div className="border-t border-line pt-3">
+                <p className="mb-2 text-xs font-medium text-soft">{t("reenableHint")}</p>
+                <button className="ghost-btn !h-12 w-full justify-start" disabled={testing !== null} onClick={() => void reenable()}>
+                  <Icon name="swap" size={18} />
+                  <span className="flex-1 text-left">{t("reenable")}</span>
+                  {testing === "reenable" && <span className="text-xs font-bold text-soft">…</span>}
+                </button>
+              </div>
             </div>
             <Row label={t("feedReminder")}><Toggle on={!!feedRem?.enabled} onChange={(v) => saveRem("feed", { enabled: v })} /></Row>
             {feedRem?.enabled && (

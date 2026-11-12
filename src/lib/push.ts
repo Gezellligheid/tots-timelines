@@ -41,3 +41,11 @@ export async function enablePush(locale: string): Promise<boolean> {
   await api("/api/push/subscribe", { subscription: sub.toJSON(), locale, tz: Intl.DateTimeFormat().resolvedOptions().timeZone });
   return true;
 }
+
+/** Drop this device's old subscription and subscribe again (fixes stale or expired subscriptions). Needs a user gesture. */
+export async function resetPush(locale: string): Promise<boolean> {
+  const reg = await navigator.serviceWorker.getRegistration();
+  const sub = await reg?.pushManager.getSubscription();
+  await sub?.unsubscribe();
+  return enablePush(locale);
+}

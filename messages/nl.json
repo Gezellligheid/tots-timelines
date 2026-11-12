@@ -378,7 +378,12 @@
     "testFeed": "Voorbeeld: volgende voeding",
     "testWrapped": "Voorbeeld: Wrapped is klaar",
     "testSent": "Verstuurd naar {n, plural, one {# apparaat} other {# apparaten}}",
-    "testNone": "Er is nog geen apparaat geregistreerd voor meldingen. Zet ze eerst aan."
+    "testNone": "Er is nog geen apparaat geregistreerd voor meldingen. Zet ze eerst aan.",
+    "reenable": "Meldingen opnieuw aanzetten op dit apparaat",
+    "reenableHint": "Komt er niets binnen? Dit zet de registratie van dit apparaat opnieuw op en vraagt opnieuw om toestemming.",
+    "reenabled": "Meldingen opnieuw aangezet op dit apparaat",
+    "checkAgain": "Ik heb het toegestaan, controleer opnieuw",
+    "unblockHint": "Tik op het slotje naast het adres (of de app-instellingen op je telefoon), zet Meldingen op Toestaan en controleer dan opnieuw."
   },
   "join": {
     "title": "Aansluiten…",
