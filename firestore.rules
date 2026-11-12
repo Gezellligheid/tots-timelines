@@ -1,0 +1,39 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isMember(babyId) {
+      return signedIn() && request.auth.uid in get(/databases/$(database)/documents/babies/$(babyId)).data.memberUids;
+    }
+
+    match /users/{uid} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+      match /pushSubscriptions/{id} { allow read, write: if signedIn() && request.auth.uid == uid; }
+    }
+
+    match /babies/{babyId} {
+      allow read: if signedIn() && request.auth.uid in resource.data.memberUids;
+      allow create: if signedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.memberUids == [request.auth.uid];
+      // members can edit details but never change membership (done server-side via invites)
+      allow update: if signedIn()
+        && request.auth.uid in resource.data.memberUids
+        && request.resource.data.memberUids == resource.data.memberUids
+        && request.resource.data.ownerUid == resource.data.ownerUid;
+      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
+
+      match /events/{eventId} {
+        allow read, write: if isMember(babyId);
+      }
+    }
+
+    match /reminders/{id} {
+      allow read, write: if signedIn()
+        && (resource == null ? request.resource.data.ownerUid == request.auth.uid : resource.data.ownerUid == request.auth.uid);
+    }
+
+    // invites are server-only (Admin SDK)
+    match /invites/{id} { allow read, write: if false; }
+  }
+}

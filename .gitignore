@@ -1,0 +1,27 @@
+# secrets
+.env
+.env.*
+!.env.example
+*firebase-adminsdk*.json
+
+# deps / build
+node_modules/
+.next/
+out/
+.vercel/
+.turbo/
+*.tsbuildinfo
+next-env.d.ts
+public/sw.js
+public/sw.js.map
+public/swe-worker-*.js
+.wrangler/
+.firebase/
+firebase-debug.log
+
+.DS_Store
+npm-debug.log*
+
+
+# design references (third-party images)
+inspirationandstyle/

@@ -1,0 +1,14 @@
+name = "totsntimelines-reminders"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+# Runs every minute and pings the Next.js app, which sends due push reminders.
+[triggers]
+crons = ["* * * * *"]
+
+[vars]
+# Set to your production URL once it exists (no trailing slash)
+APP_URL = "https://YOUR-DOMAIN-HERE"
+
+# Secret (not stored in this file):
+#   npx wrangler secret put CRON_SECRET     (same value as CRON_SECRET in Vercel)
