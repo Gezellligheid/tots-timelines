@@ -7,8 +7,8 @@ compatibility_date = "2025-01-01"
 crons = ["* * * * *"]
 
 [vars]
-# Set to your production URL once it exists (no trailing slash)
-APP_URL = "https://YOUR-DOMAIN-HERE"
+# Production URL (no trailing slash)
+APP_URL = "https://tots-timelines.vercel.app"
 
 # Secret (not stored in this file):
 #   npx wrangler secret put CRON_SECRET     (same value as CRON_SECRET in Vercel)
