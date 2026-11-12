@@ -24,7 +24,7 @@ type Tone = AccentName;
 /* ---------------- small building blocks ---------------- */
 function Stage({ tone, children }: { tone: Tone; children: React.ReactNode }) {
   return (
-    <div className={`relative flex h-full flex-col justify-center overflow-hidden px-8 pb-16 pt-28 bg-${tone}`}>
+    <div className={`relative flex h-full flex-col justify-center overflow-hidden px-8 pb-24 pt-28 bg-${tone}`}>
       <span className="breathe absolute -left-20 top-24 h-64 w-64 rounded-full bg-surface/40" />
       <motion.span className="absolute -right-16 bottom-20 h-56 w-56 rounded-full bg-surface/30" animate={{ y: [0, -16, 0] }} transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }} />
       <div className="relative">{children}</div>
@@ -282,7 +282,7 @@ function MemorySlide({ m, baby }: { m: WrappedSummary["moments"][number]; baby: 
         <MomentImage m={m} className="absolute inset-0" />
       </motion.div>
       <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,.78), rgba(0,0,0,.12) 55%, rgba(0,0,0,.28))" }} />
-      <div className="absolute inset-x-0 bottom-0 px-8 pb-16">
+      <div className="absolute inset-x-0 bottom-0 px-8 pb-24">
         <motion.span initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-white/85 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-black">
           <Icon name={isMs ? "star" : "heart"} size={12} />
           {isMs ? tm("badgeMilestone") : tm("badgeMemory")}
@@ -363,6 +363,7 @@ function Outro({ baby, n, onDone, onReplay }: { baby: Baby; n: number; onDone: (
 /* ---------------- the story ---------------- */
 export function WrappedStory({ n, demo }: { n: number; demo?: WrappedSummary }) {
   const t = useTranslations("wrapped");
+  const tc = useTranslations("common");
   const router = useRouter();
   const label = usePeriodLabel();
   const { authReady, user, baby, userDoc, patchUser } = useApp();
@@ -475,6 +476,29 @@ export function WrappedStory({ n, demo }: { n: number; demo?: WrappedSummary }) 
         <button className="glass-btn !h-10 !w-10" aria-label={t("close")} onClick={() => exit()}><Icon name="close" size={18} /></button>
       </div>
       <p className="sr-only">{label(n)}</p>
+
+      {/* back to the previous slide */}
+      <AnimatePresence>
+        {i > 0 && (
+          <motion.button
+            key="wrapped-back"
+            aria-label={tc("back")}
+            className="glass-btn absolute bottom-6 left-5 z-[200] !h-12 !w-12 shadow-[var(--shadow)]"
+            style={{ marginBottom: "env(safe-area-inset-bottom)", color: onPhoto ? "#fff" : undefined, background: onPhoto ? "rgba(255,255,255,.22)" : undefined }}
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            whileTap={{ scale: 0.88 }}
+            transition={{ type: "spring", stiffness: 420, damping: 26 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              go(i - 1, 0.08);
+            }}
+          >
+            <Icon name="back" size={22} />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence initial={false}>
         <motion.section
