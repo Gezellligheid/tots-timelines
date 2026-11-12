@@ -5,9 +5,13 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Tots & Timelines",
     short_name: "Tots",
     description: "Track your newborn's feeding, sleep, diapers and growth.",
+    id: "/",
     start_url: "/home",
     scope: "/",
     display: "standalone",
+    // never fall back to a browser toolbar ("minimal-ui" shows one)
+    display_override: ["standalone"],
+    orientation: "portrait",
     background_color: "#cfd3f8",
     theme_color: "#f6f4ee",
     icons: [
