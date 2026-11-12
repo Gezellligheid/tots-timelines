@@ -480,5 +480,21 @@
     "outroBody": "Blijf loggen. Je volgende Wrapped komt als {name} {n} maanden wordt.",
     "done": "Klaar",
     "replay": "Opnieuw bekijken"
+  },
+  "feedReminder": {
+    "title": "Herinnering voor de volgende voeding?",
+    "body": "Hoeveel tijd na een voeding mogen we je een seintje geven? Je kunt dit altijd wijzigen, in Profiel of door op de herinnering op Home te tikken.",
+    "hours": "{h} u",
+    "nextAt": "Volgende herinnering rond {time}",
+    "save": "Herinner me",
+    "update": "Opslaan",
+    "no": "Nee, bedankt",
+    "saved": "Voedingsherinnering ingesteld",
+    "off": "Voedingsherinnering uitgezet",
+    "pill": "Voedingsherinnering elke {h} u",
+    "pillOff": "Stel een voedingsherinnering in",
+    "iosNote": "Op iPhone: installeer eerst de app (Delen, dan Zet op beginscherm) om meldingen te ontvangen.",
+    "turnOff": "Herinnering uitzetten",
+    "every": "Elke"
   }
 }

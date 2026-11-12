@@ -480,5 +480,21 @@
     "outroBody": "Keep logging. Your next Wrapped arrives when {name} turns {n} months.",
     "done": "Done",
     "replay": "Watch again"
+  },
+  "feedReminder": {
+    "title": "Remind you for the next feed?",
+    "body": "How long after a feed should we nudge you? You can change this any time, in Profile or by tapping the reminder on Home.",
+    "hours": "{h} h",
+    "nextAt": "Next reminder around {time}",
+    "save": "Remind me",
+    "update": "Save",
+    "no": "No thanks",
+    "saved": "Feed reminder set",
+    "off": "Feed reminder turned off",
+    "pill": "Feed reminder every {h} h",
+    "pillOff": "Set a feed reminder",
+    "iosNote": "On iPhone, install the app first (Share, then Add to Home Screen) to receive notifications.",
+    "turnOff": "Turn off reminder",
+    "every": "Every"
   }
 }

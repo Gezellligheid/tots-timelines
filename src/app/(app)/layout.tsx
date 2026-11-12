@@ -9,6 +9,7 @@ import { Icon, type IconName } from "@/components/Icon";
 import { EASE } from "@/components/motion";
 import { Skeleton } from "@/components/ui";
 import { WrappedGate } from "@/components/WrappedGate";
+import { FeedReminderPrompt } from "@/components/FeedReminder";
 
 const TABS: { href: string; icon: IconName; key: "home" | "insights" | "timeline" | "profile" }[] = [
   { href: "/home", icon: "home", key: "home" },
@@ -42,6 +43,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             {children}
           </motion.main>
           <WrappedGate />
+          <FeedReminderPrompt />
           <nav className="fixed inset-x-0 bottom-0 z-50 mx-auto flex max-w-[520px] justify-center px-5 safe-b">
             <div className="relative flex w-full items-center justify-between rounded-full bg-ink p-2 shadow-2xl">
               {TABS.map((tab) => {

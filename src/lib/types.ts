@@ -16,6 +16,7 @@ export interface UserDoc {
   onboardingComplete: boolean;
   activeBabyId?: string;
   quiet?: { enabled: boolean; start: string; end: string };
+  feedReminderAsked?: boolean; // the post-first-feed prompt was answered
   wrappedSeen?: Record<string, number>; // `${babyId}_${n}` -> seen at
   tz?: string;
   createdAt?: number;

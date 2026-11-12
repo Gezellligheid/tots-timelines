@@ -12,7 +12,7 @@ import {
 } from "firebase/auth";
 import { collection, doc, onSnapshot, orderBy, query, where, updateDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
-import type { Baby, EventDoc, UserDoc } from "@/lib/types";
+import type { Baby, EventDoc, Reminder, UserDoc } from "@/lib/types";
 import { DAY } from "@/lib/stats";
 
 interface Ctx {
@@ -30,6 +30,7 @@ interface Ctx {
   setActiveBaby: (id: string) => void;
   patchUser: (p: Partial<UserDoc>) => Promise<void>;
   toast: (msg: string, action?: { label: string; run: () => void }) => void;
+  feedReminder: Reminder | null | undefined; // undefined = loading, null = none
   standalone: boolean;
   canInstall: boolean;
   promptInstall: () => Promise<void>;
@@ -53,6 +54,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const [babies, setBabies] = useState<Baby[] | null>(null);
   const [events, setEvents] = useState<EventDoc[]>([]);
   const [growth, setGrowth] = useState<EventDoc[]>([]);
+  const [feedReminder, setFeedReminder] = useState<Reminder | null | undefined>(undefined);
   const [moments, setMoments] = useState<EventDoc[]>([]);
   const [eventsReady, setEventsReady] = useState(false);
   const [confirmed, setConfirmed] = useState<Record<string, true>>({});
@@ -166,6 +168,17 @@ export function Providers({ children }: { children: React.ReactNode }) {
     };
   }, [babyId, confirmed, retry]);
 
+  // This parent's next-feed reminder for the active baby
+  useEffect(() => {
+    setFeedReminder(undefined);
+    if (!uid || !babyId) return;
+    return onSnapshot(
+      doc(db, "reminders", `${uid}_${babyId}_feed`),
+      (s) => setFeedReminder(s.exists() ? { id: s.id, ...(s.data() as Omit<Reminder, "id">) } : null),
+      onErr("feedReminder"),
+    );
+  }, [uid, babyId]);
+
   // Per-baby accent colour
   useEffect(() => {
     const c = baby?.color ?? "lavender";
@@ -203,8 +216,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo<Ctx>(
-    () => ({ authReady, user, userDoc, babies, baby, events, growth, moments, eventsReady, signIn, signOut, setActiveBaby, patchUser, toast, standalone, canInstall, promptInstall }),
-    [authReady, user, userDoc, babies, baby, events, growth, moments, eventsReady, signIn, signOut, setActiveBaby, patchUser, toast, standalone, canInstall, promptInstall],
+    () => ({ authReady, user, userDoc, babies, baby, events, growth, moments, eventsReady, signIn, signOut, setActiveBaby, patchUser, toast, feedReminder, standalone, canInstall, promptInstall }),
+    [authReady, user, userDoc, babies, baby, events, growth, moments, eventsReady, signIn, signOut, setActiveBaby, patchUser, toast, feedReminder, standalone, canInstall, promptInstall],
   );
 
   return (

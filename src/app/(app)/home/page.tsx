@@ -10,6 +10,7 @@ import { BabyAvatar, useNow } from "@/components/ui";
 import { LogSheet } from "@/components/LogSheet";
 import { EventRow, useDescribe } from "@/components/EventRow";
 import { WrappedCard } from "@/components/WrappedGate";
+import { FeedReminderPill } from "@/components/FeedReminder";
 import { Donut } from "@/components/charts";
 import { ageText } from "@/lib/format";
 import { patchEvent } from "@/lib/data";
@@ -131,6 +132,7 @@ export default function HomePage() {
             </span>
             <p className="mt-3 max-w-[16ch] text-[26px] font-extrabold leading-tight text-ink">{status}</p>
             {status2 && <p className="mt-1 text-sm font-semibold text-ink/70">{status2}</p>}
+            <FeedReminderPill />
           </div>
         </div>
       </WipeIn>
