@@ -363,7 +363,11 @@
     "disclaimer": "Tots & Timelines is een hulpmiddel om bij te houden en inzicht te krijgen. Het is geen medisch advies. Overleg bij zorgen altijd met je consultatiebureau of huisarts.",
     "saved": "Opgeslagen",
     "photo": "Foto",
-    "members": "Leden"
+    "members": "Leden",
+    "installBtn": "Installeren",
+    "installed": "Je gebruikt de geïnstalleerde app",
+    "installAndroid": "Open het ⋮-menu van Chrome en kies “App installeren” (niet “Toevoegen aan startscherm”).",
+    "installIos": "Tik in Safari op Delen en kies “Zet op beginscherm”."
   },
   "join": {
     "title": "Aansluiten…",

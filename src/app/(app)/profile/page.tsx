@@ -47,7 +47,9 @@ export default function ProfilePage() {
   const tc = useTranslations("common");
   const tOn = useTranslations("onboarding");
   const locale = useLocale();
-  const { user, userDoc, babies, baby, setActiveBaby, patchUser, signOut, toast } = useApp();
+  const { user, userDoc, babies, baby, setActiveBaby, patchUser, signOut, toast, standalone, canInstall, promptInstall } = useApp();
+  const [ios, setIos] = useState(false);
+  useEffect(() => setIos(/iphone|ipad|ipod/i.test(navigator.userAgent)), []);
   const [theme, setThemeState] = useState<"light" | "dark" | "auto">("auto");
   const [push, setPush] = useState<PushState>("unsupported");
   const [reminders, setReminders] = useState<Reminder[]>([]);
@@ -128,6 +130,19 @@ export default function ProfilePage() {
   return (
     <div className="space-y-5 pt-2">
       <h1 className="text-3xl font-extrabold"><RevealText text={t("title")} /></h1>
+
+      <Section title={t("install")}>
+        {standalone ? (
+          <p className="flex items-center gap-2 rounded-[18px] bg-mint p-3 px-4 text-sm font-bold text-mint-ink"><Icon name="check" size={18} />{t("installed")}</p>
+        ) : canInstall ? (
+          <>
+            <p className="text-sm text-soft">{t("installHint")}</p>
+            <button className="pill-btn w-full" onClick={() => void promptInstall()}><Icon name="download" size={20} />{t("installBtn")}</button>
+          </>
+        ) : (
+          <p className="text-sm font-medium text-soft">{ios ? t("installIos") : t("installAndroid")}</p>
+        )}
+      </Section>
 
       <Section title={t("babies")}>
         <div className="space-y-2">

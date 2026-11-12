@@ -30,6 +30,9 @@ interface Ctx {
   setActiveBaby: (id: string) => void;
   patchUser: (p: Partial<UserDoc>) => Promise<void>;
   toast: (msg: string, action?: { label: string; run: () => void }) => void;
+  standalone: boolean;
+  canInstall: boolean;
+  promptInstall: () => Promise<void>;
 }
 
 const AppCtx = createContext<Ctx>(null!);
@@ -56,6 +59,38 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const [retry, setRetry] = useState(0);
   const [toastState, setToastState] = useState<{ id: number; msg: string; action?: { label: string; run: () => void } } | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // PWA install state
+  const deferredPrompt = useRef<{ prompt: () => Promise<void>; userChoice: Promise<unknown> } | null>(null);
+  const [canInstall, setCanInstall] = useState(false);
+  const [standalone, setStandalone] = useState(false);
+  useEffect(() => {
+    setStandalone(window.matchMedia("(display-mode: standalone)").matches || (navigator as unknown as { standalone?: boolean }).standalone === true);
+    const onPrompt = (e: Event) => {
+      e.preventDefault();
+      deferredPrompt.current = e as unknown as NonNullable<typeof deferredPrompt.current>;
+      setCanInstall(true);
+    };
+    const onInstalled = () => {
+      deferredPrompt.current = null;
+      setCanInstall(false);
+      setStandalone(true);
+    };
+    window.addEventListener("beforeinstallprompt", onPrompt);
+    window.addEventListener("appinstalled", onInstalled);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", onPrompt);
+      window.removeEventListener("appinstalled", onInstalled);
+    };
+  }, []);
+  const promptInstall = useCallback(async () => {
+    const p = deferredPrompt.current;
+    if (!p) return;
+    await p.prompt();
+    await p.userChoice;
+    deferredPrompt.current = null;
+    setCanInstall(false);
+  }, []);
 
   useEffect(() => {
     getRedirectResult(auth).catch(() => {});
@@ -168,8 +203,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo<Ctx>(
-    () => ({ authReady, user, userDoc, babies, baby, events, growth, moments, eventsReady, signIn, signOut, setActiveBaby, patchUser, toast }),
-    [authReady, user, userDoc, babies, baby, events, growth, moments, eventsReady, signIn, signOut, setActiveBaby, patchUser, toast],
+    () => ({ authReady, user, userDoc, babies, baby, events, growth, moments, eventsReady, signIn, signOut, setActiveBaby, patchUser, toast, standalone, canInstall, promptInstall }),
+    [authReady, user, userDoc, babies, baby, events, growth, moments, eventsReady, signIn, signOut, setActiveBaby, patchUser, toast, standalone, canInstall, promptInstall],
   );
 
   return (

@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
@@ -21,7 +21,12 @@ const TILES: EventType[] = ["sleep", "feed", "growth", "diaper"];
 export default function HomePage() {
   const t = useTranslations("home");
   const tAge = useTranslations("age");
-  const { baby, babies, userDoc, events, moments, eventsReady, setActiveBaby } = useApp();
+  const { baby, babies, userDoc, events, moments, eventsReady, setActiveBaby, standalone, canInstall, promptInstall } = useApp();
+  const tp = useTranslations("profile");
+  const [installDismissed, setInstallDismissed] = useState(true);
+  useEffect(() => {
+    try { setInstallDismissed(localStorage.getItem("tt-install-dismissed") === "1"); } catch { setInstallDismissed(false); }
+  }, []);
   const tm = useTranslations("moments");
   const [sheet, setSheet] = useState<{ type: EventType; origin: { x: number; y: number } } | null>(null);
   const [closing, setClosing] = useState(false);
@@ -100,6 +105,15 @@ export default function HomePage() {
               {b.name}
             </button>
           ))}
+        </div>
+      )}
+
+      {canInstall && !standalone && !installDismissed && (
+        <div className="flex items-center gap-3 rounded-[24px] bg-lavender p-3 pl-4">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-surface text-lavender-ink"><Icon name="download" size={22} /></span>
+          <p className="flex-1 text-sm font-bold leading-snug">{tp("installHint")}</p>
+          <button className="pill-btn !h-10 !px-4 !text-sm" onClick={() => void promptInstall()}>{tp("installBtn")}</button>
+          <button aria-label="Close" className="grid h-9 w-9 place-items-center rounded-full" onClick={() => { setInstallDismissed(true); try { localStorage.setItem("tt-install-dismissed", "1"); } catch {} }}><Icon name="close" size={16} /></button>
         </div>
       )}
 

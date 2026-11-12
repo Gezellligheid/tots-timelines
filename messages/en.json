@@ -363,7 +363,11 @@
     "disclaimer": "Tots & Timelines is a logging and insight tool. It is not medical advice. Always talk to your pediatrician about health concerns.",
     "saved": "Saved",
     "photo": "Photo",
-    "members": "Members"
+    "members": "Members",
+    "installBtn": "Install",
+    "installed": "You're using the installed app",
+    "installAndroid": "Open Chrome's ⋮ menu and choose “Install app” (not “Add to Home screen”).",
+    "installIos": "Tap the Share button in Safari, then “Add to Home Screen”."
   },
   "join": {
     "title": "Joining…",
