@@ -383,8 +383,7 @@
     "reenableHint": "Komt er niets binnen? Dit zet de registratie van dit apparaat opnieuw op en vraagt opnieuw om toestemming.",
     "reenabled": "Meldingen opnieuw aangezet op dit apparaat",
     "checkAgain": "Ik heb het toegestaan, controleer opnieuw",
-    "unblockHint": "Tik op het slotje naast het adres (of de app-instellingen op je telefoon), zet Meldingen op Toestaan en controleer dan opnieuw.",
-    "dailyAutoOn": "Dagelijkse herinnering ingesteld om 09:00. Je kunt dit hieronder aanpassen."
+    "unblockHint": "Tik op het slotje naast het adres (of de app-instellingen op je telefoon), zet Meldingen op Toestaan en controleer dan opnieuw."
   },
   "join": {
     "title": "Aansluiten…",

@@ -383,8 +383,7 @@
     "reenableHint": "Not receiving anything? This resets this device's registration and asks for permission again.",
     "reenabled": "Notifications re-enabled on this device",
     "checkAgain": "I've allowed it, check again",
-    "unblockHint": "Tap the lock icon next to the address (or the app's settings on your phone), set Notifications to Allow, then check again.",
-    "dailyAutoOn": "Daily reminder set for 09:00. You can change it below."
+    "unblockHint": "Tap the lock icon next to the address (or the app's settings on your phone), set Notifications to Allow, then check again."
   },
   "join": {
     "title": "Joining…",
