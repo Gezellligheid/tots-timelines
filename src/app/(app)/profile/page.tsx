@@ -57,6 +57,8 @@ export default function ProfilePage() {
   const [edit, setEdit] = useState(false);
   const [confirmDel, setConfirmDel] = useState(false);
   const [invite, setInvite] = useState<string | null>(null);
+  const [testing, setTesting] = useState<string | null>(null);
+  const [testMsg, setTestMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => { setThemeState(currentTheme()); pushState().then(setPush); }, []);
@@ -91,8 +93,16 @@ export default function ProfilePage() {
       toast(tc("error"));
     }
   };
-  const testPush = async () => {
-    try { await api("/api/push/test", {}); } catch { toast(tc("error")); }
+  const testPush = async (kind: "basic" | "feed" | "wrapped") => {
+    setTesting(kind);
+    setTestMsg(null);
+    try {
+      const { sent } = await api<{ sent: number }>("/api/push/test", { kind, babyName: baby.name });
+      setTestMsg(sent > 0 ? t("testSent", { n: sent }) : t("testNone"));
+    } catch {
+      setTestMsg(tc("error"));
+    }
+    setTesting(null);
   };
 
   const createInvite = async () => {
@@ -212,9 +222,22 @@ export default function ProfilePage() {
         {push === "ready" && <button className="pill-btn w-full" onClick={turnOnPush}><Icon name="bell" size={20} />{t("remindersOn")}</button>}
         {push === "enabled" && (
           <>
-            <div className="flex items-center justify-between rounded-[18px] bg-mint p-3 px-4 text-sm font-bold text-mint-ink">
-              <span className="flex items-center gap-2"><Icon name="check" size={18} />{t("enabled")}</span>
-              <button className="underline" onClick={testPush}>{t("testPush")}</button>
+            <p className="flex items-center gap-2 rounded-[18px] bg-mint p-3 px-4 text-sm font-bold text-mint-ink"><Icon name="check" size={18} />{t("enabled")}</p>
+            <div className="space-y-3 rounded-[22px] bg-surface2 p-4">
+              <div>
+                <p className="font-extrabold">{t("testTitle")}</p>
+                <p className="text-sm text-soft">{t("testHint")}</p>
+              </div>
+              <div className="grid gap-2">
+                {([["basic", "bell", t("testBasic")], ["feed", "bottle", t("testFeed")], ["wrapped", "star", t("testWrapped")]] as const).map(([k, icon, label]) => (
+                  <button key={k} className="ghost-btn !h-12 w-full justify-start" disabled={testing !== null} onClick={() => void testPush(k)}>
+                    <Icon name={icon} size={18} />
+                    <span className="flex-1 text-left">{label}</span>
+                    {testing === k && <span className="text-xs font-bold text-soft">…</span>}
+                  </button>
+                ))}
+              </div>
+              {testMsg && <p className="text-center text-sm font-bold text-soft">{testMsg}</p>}
             </div>
             <Row label={t("feedReminder")}><Toggle on={!!feedRem?.enabled} onChange={(v) => saveRem("feed", { enabled: v })} /></Row>
             {feedRem?.enabled && (

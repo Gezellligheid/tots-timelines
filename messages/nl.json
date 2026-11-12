@@ -371,7 +371,14 @@
     "wrappedTitle": "Wrapped",
     "wrappedEmpty": "Je eerste Wrapped komt als {name} 3 maanden wordt en er genoeg logs zijn.",
     "wrappedRange": "Maand {from}–{to}",
-    "wrappedFirst": "Eerste {n} maanden"
+    "wrappedFirst": "Eerste {n} maanden",
+    "testTitle": "Meldingen testen",
+    "testHint": "Zie hoe elke melding eruitziet op dit apparaat. Hij komt binnen enkele seconden aan.",
+    "testBasic": "Stuur een testmelding",
+    "testFeed": "Voorbeeld: volgende voeding",
+    "testWrapped": "Voorbeeld: Wrapped is klaar",
+    "testSent": "Verstuurd naar {n, plural, one {# apparaat} other {# apparaten}}",
+    "testNone": "Er is nog geen apparaat geregistreerd voor meldingen. Zet ze eerst aan."
   },
   "join": {
     "title": "Aansluiten…",

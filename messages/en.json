@@ -371,7 +371,14 @@
     "wrappedTitle": "Wrapped",
     "wrappedEmpty": "Your first Wrapped arrives when {name} turns 3 months and there are enough logs.",
     "wrappedRange": "Months {from}–{to}",
-    "wrappedFirst": "First {n} months"
+    "wrappedFirst": "First {n} months",
+    "testTitle": "Test notifications",
+    "testHint": "See how each one looks on this device. It should arrive within a few seconds.",
+    "testBasic": "Send a test notification",
+    "testFeed": "Preview: next-feed reminder",
+    "testWrapped": "Preview: Wrapped is ready",
+    "testSent": "Sent to {n, plural, one {# device} other {# devices}}",
+    "testNone": "No device is registered for notifications yet. Turn them on first."
   },
   "join": {
     "title": "Joining…",
