@@ -8,12 +8,15 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/home",
     scope: "/",
     display: "standalone",
-    background_color: "#f6f4ee",
+    background_color: "#cfd3f8",
     theme_color: "#f6f4ee",
     icons: [
-      { src: "/icons/192", sizes: "192x192", type: "image/png" },
-      { src: "/icons/512", sizes: "512x512", type: "image/png" },
-      { src: "/icons/512", sizes: "512x512", type: "image/png", purpose: "maskable" },
+      // Full-bleed artwork for Android's adaptive icon shapes. Distinct URLs so browsers
+      // don't treat these as duplicates of the "any" icons below.
+      { src: "/icons/192?v=2&m=1", sizes: "192x192", type: "image/png", purpose: "maskable" },
+      { src: "/icons/512?v=2&m=1", sizes: "512x512", type: "image/png", purpose: "maskable" },
+      { src: "/icons/192?v=2", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/icons/512?v=2", sizes: "512x512", type: "image/png", purpose: "any" },
     ],
   };
 }
