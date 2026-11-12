@@ -9,6 +9,7 @@ import { EASE, RevealText, WipeIn } from "@/components/motion";
 import { BabyAvatar, useNow } from "@/components/ui";
 import { LogSheet } from "@/components/LogSheet";
 import { EventRow, useDescribe } from "@/components/EventRow";
+import { WrappedCard } from "@/components/WrappedGate";
 import { Donut } from "@/components/charts";
 import { ageText } from "@/lib/format";
 import { patchEvent } from "@/lib/data";
@@ -107,6 +108,8 @@ export default function HomePage() {
           ))}
         </div>
       )}
+
+      <WrappedCard />
 
       {canInstall && !standalone && !installDismissed && (
         <div className="flex items-center gap-3 rounded-[24px] bg-lavender p-3 pl-4">

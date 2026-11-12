@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { adminDb } from "@/lib/server/admin";
 import { sendToUser } from "@/lib/server/push";
+import { sweepDueWrapped } from "@/lib/server/wrapped";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +37,7 @@ export async function GET(req: Request) {
   }
   const db = adminDb();
   const now = Date.now();
+  const wrapped = await sweepDueWrapped().catch(() => -1);
   const snap = await db.collection("reminders").where("enabled", "==", true).get();
   const users = new Map<string, FirebaseFirestore.DocumentData | undefined>();
   const babies = new Map<string, FirebaseFirestore.DocumentData | undefined>();
@@ -68,5 +70,5 @@ export async function GET(req: Request) {
       sent += n;
     }
   }
-  return NextResponse.json({ checked: snap.size, sent });
+  return NextResponse.json({ checked: snap.size, sent, wrapped });
 }

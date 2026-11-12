@@ -14,6 +14,7 @@ import { TakePhotoButton } from "@/components/CameraSheet";
 import { DateField, TimeField } from "@/components/DatePicker";
 import { api } from "@/lib/data";
 import { uploadPhoto } from "@/lib/media";
+import { nextWrappedAt, wrappedKey } from "@/lib/wrapped";
 import { currentTheme, setTheme } from "@/lib/locale";
 import { enablePush, pushState, type PushState } from "@/lib/push";
 import { ACCENTS, type Baby, type FeedingType, type Reminder } from "@/lib/types";
@@ -130,6 +131,26 @@ export default function ProfilePage() {
   return (
     <div className="space-y-5 pt-2">
       <h1 className="text-3xl font-extrabold"><RevealText text={t("title")} /></h1>
+
+      <Section title={t("wrappedTitle")}>
+        {(baby.wrappedAvailable ?? []).length ? (
+          <div className="space-y-2">
+            {[...(baby.wrappedAvailable ?? [])].sort((a, b) => b - a).map((n) => {
+              const unseen = !userDoc.wrappedSeen?.[wrappedKey(baby.id, n)];
+              return (
+                <Link key={n} href={`/wrapped/${n}`} className="flex items-center gap-3 rounded-[22px] bg-butter p-3 pr-4">
+                  <span className="grid h-11 w-11 place-items-center rounded-full bg-surface text-butter-ink"><Icon name="star" size={22} /></span>
+                  <span className="flex-1 font-bold">{n === 3 ? t("wrappedFirst", { n }) : t("wrappedRange", { from: n - 2, to: n })}</span>
+                  {unseen && <span className="on-ink rounded-full px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider">New</span>}
+                  <Icon name="chevR" size={18} />
+                </Link>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-sm font-medium text-soft">{t("wrappedEmpty", { name: baby.name })}</p>
+        )}
+      </Section>
 
       <Section title={t("install")}>
         {standalone ? (
@@ -272,6 +293,7 @@ function EditBaby({ open, onClose, baby }: { open: boolean; onClose: () => void;
     setBusy(true);
     try {
       const patch: Partial<Baby> = { name: name.trim() || baby.name, feedingType: feeding, birthDate: birth, color };
+      if (birth !== baby.birthDate) patch.nextWrappedAt = nextWrappedAt(birth, baby.wrappedCheckedN ?? 0);
       if (file) patch.photoKey = await uploadPhoto(file, baby.id);
       await updateDoc(doc(db, "babies", baby.id), patch);
       toast(t("saved"));

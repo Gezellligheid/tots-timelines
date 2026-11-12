@@ -26,6 +26,9 @@ service cloud.firestore {
       match /events/{eventId} {
         allow read, write: if isMember(babyId);
       }
+      match /wraps/{n} {
+        allow read, write: if isMember(babyId);
+      }
     }
 
     match /reminders/{id} {

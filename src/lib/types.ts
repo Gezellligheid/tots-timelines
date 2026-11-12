@@ -16,6 +16,7 @@ export interface UserDoc {
   onboardingComplete: boolean;
   activeBabyId?: string;
   quiet?: { enabled: boolean; start: string; end: string };
+  wrappedSeen?: Record<string, number>; // `${babyId}_${n}` -> seen at
   tz?: string;
   createdAt?: number;
 }
@@ -36,6 +37,12 @@ export interface Baby {
   memberUids: string[];
   members?: Record<string, { name: string; role?: Role }>;
   lastFeedAt?: number;
+  // Wrapped bookkeeping (server decides readiness)
+  nextWrappedAt?: number;
+  wrappedCheckedN?: number;
+  wrappedReadyN?: number;
+  wrappedAvailable?: number[];
+  wrappedPushedN?: number;
 }
 
 export type EventType = "feed" | "sleep" | "diaper" | "growth" | "moment";

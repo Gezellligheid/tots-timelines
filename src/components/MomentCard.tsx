@@ -11,6 +11,11 @@ export function useMomentTitle() {
   return (e: EventDoc) => e.data.title || (e.data.milestone ? tm(`ms.${e.data.milestone}`) : tm("badgeMemory"));
 }
 
+export function useMomentTitleKey() {
+  const tm = useTranslations("moments");
+  return (m: { title?: string; milestone?: string }) => m.title || (m.milestone ? tm(`ms.${m.milestone}`) : tm("badgeMemory"));
+}
+
 /** Big card for a milestone or memory, with the photo on top when there is one. */
 export function MomentCard({ e, onClick }: { e: EventDoc; onClick?: () => void }) {
   const tm = useTranslations("moments");

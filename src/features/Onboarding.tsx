@@ -14,6 +14,7 @@ import { LangToggle } from "@/components/LangToggle";
 import { DateField } from "@/components/DatePicker";
 import { TakePhotoButton } from "@/components/CameraSheet";
 import { uploadPhoto } from "@/lib/media";
+import { nextWrappedAt } from "@/lib/wrapped";
 import { defaultUnits } from "@/lib/units";
 import { ACCENTS, type AccentName, type Baby, type FeedingType, type Role, type Sex, type Units, type UserDoc } from "@/lib/types";
 
@@ -142,6 +143,7 @@ export function Onboarding({ mode }: { mode: Mode }) {
           color: draft.color,
           ownerUid: uid,
           memberUids: [uid],
+          nextWrappedAt: nextWrappedAt(draft.birthDate),
           members: { [uid]: { name: name || "Parent", ...((draft.role ?? userDoc?.role) ? { role: (draft.role ?? userDoc?.role) as Role } : {}) } },
         };
         await setDoc(ref, baby);
