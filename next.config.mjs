@@ -14,7 +14,11 @@ const nextConfig = {
   poweredByHeader: false,
   // allow testing from a phone on the same Wi-Fi
   allowedDevOrigins: ["192.168.*.*", "*.local"],
-  experimental: { optimizePackageImports: ["framer-motion", "date-fns"] },
+  experimental: {
+    optimizePackageImports: ["framer-motion", "date-fns"],
+    // Keep visited pages for a while so switching tabs back and forth is instant
+    staleTimes: { dynamic: 60, static: 300 },
+  },
   // Proxy Firebase's auth handler so sign-in works with authDomain = our own domain
   async rewrites() {
     return [

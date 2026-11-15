@@ -26,6 +26,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => setHydrated(true), []);
 
+  // Move the tab highlight the instant a tab is tapped, not when the next page has finished loading
+  const [pending, setPending] = useState<string | null>(null);
+  useEffect(() => setPending(null), [path]);
+  const current = pending ?? path;
+
   useEffect(() => {
     if (!authReady) return;
     if (!user) return router.replace("/");
@@ -39,7 +44,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <div className="mx-auto min-h-dvh w-full max-w-[520px]">
       {ready ? (
         <>
-          <motion.main key={path} initial={{ clipPath: "inset(0 0 100% 0)", opacity: 0.6 }} animate={{ clipPath: "inset(0 0 0% 0)", opacity: 1 }} transition={{ duration: 0.7, ease: EASE }} className="px-5 pb-36 safe-t">
+          <motion.main key={path} initial={{ clipPath: "inset(0 0 100% 0)", opacity: 0.6 }} animate={{ clipPath: "inset(0 0 0% 0)", opacity: 1 }} transition={{ duration: 0.5, ease: EASE }} className="px-5 pb-36 safe-t">
             {children}
           </motion.main>
           <WrappedGate />
@@ -47,9 +52,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <nav className="fixed inset-x-0 bottom-0 z-50 mx-auto flex max-w-[520px] justify-center px-5 safe-b">
             <div className="relative flex w-full items-center justify-between rounded-full bg-ink p-2 shadow-2xl">
               {TABS.map((tab) => {
-                const active = path.startsWith(tab.href);
+                const active = current.startsWith(tab.href);
                 return (
-                  <Link key={tab.href} href={tab.href} aria-label={t(tab.key)} className="relative flex h-14 flex-1 items-center justify-center gap-2 rounded-full" style={{ color: "var(--bg)" }}>
+                  <Link key={tab.href} href={tab.href} aria-label={t(tab.key)} onClick={() => setPending(tab.href)} className="relative flex h-14 flex-1 items-center justify-center gap-2 rounded-full" style={{ color: "var(--bg)" }}>
                     {active && <motion.span layoutId="tab" className="absolute inset-0 rounded-full bg-accent" transition={{ type: "spring", stiffness: 380, damping: 32 }} />}
                     <span className={`relative flex items-center gap-2 ${active ? "text-ink" : "opacity-70"}`}>
                       <Icon name={tab.icon} size={22} />
