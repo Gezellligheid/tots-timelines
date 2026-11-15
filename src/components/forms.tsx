@@ -62,10 +62,35 @@ export function Stepper({ value, min, max, step = 1, onChange, format }: { value
   );
 }
 
-function NumField({ value, onChange, suffix, ph, step = "0.01" }: { value: string; onChange: (v: string) => void; suffix: string; ph?: string; step?: string }) {
+/** Keep digits and a single decimal separator. A dot or a comma both work, and the one the person types is kept. */
+function cleanDecimal(raw: string, maxDecimals: number) {
+  const s = raw.replace(/[^0-9.,]/g, "");
+  if (maxDecimals === 0) return s.replace(/[.,]/g, "");
+  const m = /[.,]/.exec(s);
+  if (!m) return s;
+  const head = s.slice(0, m.index).replace(/[.,]/g, "");
+  const tail = s.slice(m.index + 1).replace(/[.,]/g, "").slice(0, maxDecimals);
+  return head + s[m.index] + tail;
+}
+const toNum = (s: string) => parseFloat(s.replace(",", "."));
+
+/**
+ * A text input with a decimal keypad. (A type="number" input reports a half-typed "3." as empty on phones,
+ * which made the dot and comma impossible to type.)
+ */
+function NumField({ value, onChange, suffix, ph, maxDecimals = 3 }: { value: string; onChange: (v: string) => void; suffix: string; ph?: string; maxDecimals?: number }) {
   return (
     <label className="relative block flex-1">
-      <input className="field pr-14" inputMode="decimal" type="number" step={step} min="0" placeholder={ph} value={value} onChange={(e) => onChange(e.target.value)} />
+      <input
+        className="field pr-14"
+        type="text"
+        inputMode="decimal"
+        autoComplete="off"
+        enterKeyHint="done"
+        placeholder={ph}
+        value={value}
+        onChange={(e) => onChange(cleanDecimal(e.target.value, maxDecimals))}
+      />
       <span className="absolute right-5 top-1/2 -translate-y-1/2 font-semibold text-soft">{suffix}</span>
     </label>
   );
@@ -84,19 +109,22 @@ export function WeightInput({ valueG, onChange, units }: { valueG?: number; onCh
         ph="3.40"
         onChange={(v) => {
           setKg(v);
-          onChange(v === "" ? undefined : Math.round(parseFloat(v) * 1000));
+          const n = toNum(v);
+          // "3.4" or "3,4" means kilograms; a whole number of 100 or more is read as grams (e.g. 3400)
+          onChange(Number.isFinite(n) ? Math.round(n >= 100 ? n : n * 1000) : undefined);
         }}
       />
     );
   }
   const emit = (l: string, o: string) => {
-    if (l === "" && o === "") return onChange(undefined);
-    onChange(Math.round(((parseFloat(l) || 0) * 16 + (parseFloat(o) || 0)) * 28.349523));
+    const a = toNum(l), b = toNum(o);
+    if (!Number.isFinite(a) && !Number.isFinite(b)) return onChange(undefined);
+    onChange(Math.round(((Number.isFinite(a) ? a : 0) * 16 + (Number.isFinite(b) ? b : 0)) * 28.349523));
   };
   return (
     <div className="flex gap-3">
-      <NumField value={lb} suffix="lb" ph="7" step="1" onChange={(v) => { setLb(v); emit(v, oz); }} />
-      <NumField value={oz} suffix="oz" ph="8" step="0.1" onChange={(v) => { setOz(v); emit(lb, v); }} />
+      <NumField value={lb} suffix="lb" ph="7" maxDecimals={0} onChange={(v) => { setLb(v); emit(v, oz); }} />
+      <NumField value={oz} suffix="oz" ph="8" maxDecimals={1} onChange={(v) => { setOz(v); emit(lb, v); }} />
     </div>
   );
 }
