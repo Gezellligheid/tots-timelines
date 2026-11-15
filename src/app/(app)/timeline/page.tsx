@@ -154,7 +154,7 @@ export default function TimelinePage() {
         <div className="relative space-y-7">
           <AnimatePresence mode="popLayout" initial={false}>
             {groups.map(([key, items]) => (
-              <motion.section key={filter + key} initial={{ clipPath: "inset(0 0 100% 0 round 24px)" }} animate={{ clipPath: "inset(0 0 0% 0 round 24px)" }} transition={{ duration: 0.5, ease: EASE }}>
+              <motion.section key={filter + key} initial={{ clipPath: "inset(0 0 100% 0)" }} animate={{ clipPath: "inset(0 0 0% 0)", transitionEnd: { clipPath: "none" } }} transition={{ duration: 0.5, ease: EASE }}>
                 <h2 className="mb-3 px-1 text-sm font-extrabold uppercase tracking-wide text-soft">{label(key)}</h2>
                 <div className="space-y-3">
                   {items.map((e) => (e.type === "moment" ? <MomentCard key={e.id} e={e} onClick={() => setSel(e)} /> : <EventRow key={e.id} e={e} units={units} onClick={() => setSel(e)} />))}

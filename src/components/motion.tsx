@@ -49,7 +49,7 @@ export function WipeIn({ children, className = "", delay = 0 }: { children: Reac
     <motion.div
       className={className}
       initial={reduce ? { opacity: 0 } : { clipPath: "inset(100% 0% 0% 0% round 28px)", y: 16 }}
-      animate={reduce ? { opacity: 1 } : { clipPath: "inset(0% 0% 0% 0% round 28px)", y: 0 }}
+      animate={reduce ? { opacity: 1 } : { clipPath: "inset(0% 0% 0% 0% round 28px)", y: 0, transitionEnd: { clipPath: "none" } }}
       transition={{ duration: 0.8, ease: EASE, delay }}
     >
       {children}

@@ -101,7 +101,7 @@ function PickerSheet({ open, onClose, origin, mode, value, min, max, onPick }: {
                     custom={dir}
                     className="absolute inset-0"
                     initial={{ clipPath: dir > 0 ? "inset(0 0 0 100% round 24px)" : "inset(0 100% 0 0 round 24px)", opacity: 0.4 }}
-                    animate={{ clipPath: "inset(0 0% 0 0% round 24px)", opacity: 1 }}
+                    animate={{ clipPath: "inset(0 0% 0 0% round 24px)", opacity: 1, transitionEnd: { clipPath: "none" } }}
                     exit={{ opacity: 0, transition: { duration: 0.2 } }}
                     transition={{ duration: 0.55, ease: EASE }}
                   >
