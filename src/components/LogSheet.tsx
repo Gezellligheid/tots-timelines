@@ -7,7 +7,8 @@ import { Icon } from "./Icon";
 import { ChoiceCard, LengthInput, Stepper, WeightInput } from "./forms";
 import { useApp } from "@/providers/Providers";
 import { addEvent } from "@/lib/data";
-import { uploadPhoto } from "@/lib/media";
+import { queuePhotoForLater, uploadPhoto } from "@/lib/media";
+import { isOnline } from "@/lib/net";
 import { MILESTONES } from "@/lib/milestones";
 import { TakePhotoButton } from "./CameraSheet";
 import { TempWheel } from "./Wheel";
@@ -173,16 +174,31 @@ function Body({ type, onClose }: { type: EventType; onClose: () => void }) {
     if (isMs ? !msKey && !title : !title && !note.trim() && !file) return toast(tm("need"));
     setBusy(true);
     try {
-      const photoKey = file ? await uploadPhoto(file, baby.id) : undefined;
-      addEvent(baby.id, {
+      let photoKey: string | undefined;
+      let later = false; // no connection: keep the photo on the device and upload it afterwards
+      if (file) {
+        if (isOnline()) {
+          try {
+            photoKey = await uploadPhoto(file, baby.id);
+          } catch {
+            later = true;
+          }
+        } else later = true;
+      }
+      const eventId = addEvent(baby.id, {
         type: "moment",
         start: when,
         end: when,
         data: { kind: mmode, ...(isMs && msKey ? { milestone: msKey } : {}), ...(title ? { title } : {}), ...(shared && baby.familyToken ? { shared: true } : {}) },
         note: trimNote,
         photoKey,
+        ...(later ? { photoPending: true } : {}),
       });
-      done();
+      if (later && file) {
+        await queuePhotoForLater(file, baby.id, eventId);
+        toast(tm("photoQueued"));
+        onClose();
+      } else done();
     } catch {
       toast(tc("error"));
       setBusy(false);

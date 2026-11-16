@@ -77,6 +77,8 @@ export interface EventDoc {
   data: EventData;
   note?: string;
   photoKey?: string;
+  photoPending?: boolean; // photo chosen offline, uploads when back online
+  pending?: boolean; // client only: not yet synced to the server
   createdBy: string;
   updatedAt: number;
 }

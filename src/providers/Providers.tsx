@@ -10,8 +10,10 @@ import {
   signOut as fbSignOut,
   type User,
 } from "firebase/auth";
-import { collection, doc, onSnapshot, orderBy, query, where, updateDoc, setDoc } from "firebase/firestore";
+import { collection, disableNetwork, doc, enableNetwork, onSnapshot, orderBy, query, where, updateDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
+import { setSimulatedOffline } from "@/lib/net";
+import { processPhotoQueue } from "@/lib/media";
 import { applyTheme } from "@/lib/locale";
 import type { Baby, EventDoc, Reminder, UserDoc } from "@/lib/types";
 import { DAY } from "@/lib/stats";
@@ -32,6 +34,10 @@ interface Ctx {
   patchUser: (p: Partial<UserDoc>) => Promise<void>;
   toast: (msg: string, action?: { label: string; run: () => void }) => void;
   feedReminder: Reminder | null | undefined; // undefined = loading, null = none
+  online: boolean;
+  pendingCount: number; // entries saved on this device but not yet synced
+  simulateOffline: (v: boolean) => void; // development only
+  simulatedOffline: boolean;
   standalone: boolean;
   canInstall: boolean;
   promptInstall: () => Promise<void>;
@@ -62,6 +68,27 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const [retry, setRetry] = useState(0);
   const [toastState, setToastState] = useState<{ id: number; msg: string; action?: { label: string; run: () => void } } | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Connection: the browser's own signal, plus a development switch to simulate being offline
+  const [netOnline, setNetOnline] = useState(true);
+  const [simOffline, setSimOffline] = useState(false);
+  useEffect(() => {
+    setNetOnline(navigator.onLine);
+    const up = () => setNetOnline(true);
+    const down = () => setNetOnline(false);
+    window.addEventListener("online", up);
+    window.addEventListener("offline", down);
+    return () => {
+      window.removeEventListener("online", up);
+      window.removeEventListener("offline", down);
+    };
+  }, []);
+  const online = netOnline && !simOffline;
+  const simulateOffline = useCallback((v: boolean) => {
+    setSimulatedOffline(v);
+    setSimOffline(v);
+    void (v ? disableNetwork(db) : enableNetwork(db));
+  }, []);
 
   // PWA install state
   const deferredPrompt = useRef<{ prompt: () => Promise<void>; userChoice: Promise<unknown> } | null>(null);
@@ -144,9 +171,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
     let retryTimer: ReturnType<typeof setTimeout> | undefined;
     const since = Date.now() - EVENT_WINDOW_DAYS * DAY;
     const col = collection(db, "babies", babyId, "events");
-    const map = (s: { docs: { id: string; data: () => unknown }[] }) =>
-      s.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<EventDoc, "id">) }));
-    const u1 = onSnapshot(query(col, where("start", ">=", since), orderBy("start", "desc")), (s) => {
+    const map = (s: { docs: { id: string; data: () => unknown; metadata: { hasPendingWrites: boolean } }[] }) =>
+      s.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<EventDoc, "id">), ...(d.metadata.hasPendingWrites ? { pending: true } : {}) }));
+    const u1 = onSnapshot(query(col, where("start", ">=", since), orderBy("start", "desc")), { includeMetadataChanges: true }, (s) => {
       setEvents(map(s).filter((e) => e.type !== "growth" && e.type !== "moment"));
       setEventsReady(true);
     }, (e) => {
@@ -155,6 +182,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     });
     const u2 = onSnapshot(
       query(col, where("type", "in", ["growth", "moment"])),
+      { includeMetadataChanges: true },
       (s) => {
         const all = map(s).sort((a, b) => a.start - b.start);
         setGrowth(all.filter((e) => e.type === "growth"));
@@ -179,6 +207,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
       onErr("feedReminder"),
     );
   }, [uid, babyId]);
+
+  const pendingCount = useMemo(() => [...events, ...growth, ...moments].filter((e) => e.pending).length, [events, growth, moments]);
+
+  // photos chosen offline upload as soon as there is a connection
+  useEffect(() => {
+    if (uid && online) void processPhotoQueue();
+  }, [uid, online]);
 
   // Night mode switches itself on and off at 22:00 / 06:00 without a reload
   useEffect(() => {
@@ -223,8 +258,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo<Ctx>(
-    () => ({ authReady, user, userDoc, babies, baby, events, growth, moments, eventsReady, signIn, signOut, setActiveBaby, patchUser, toast, feedReminder, standalone, canInstall, promptInstall }),
-    [authReady, user, userDoc, babies, baby, events, growth, moments, eventsReady, signIn, signOut, setActiveBaby, patchUser, toast, feedReminder, standalone, canInstall, promptInstall],
+    () => ({ authReady, user, userDoc, babies, baby, events, growth, moments, eventsReady, signIn, signOut, setActiveBaby, patchUser, toast, feedReminder, online, pendingCount, simulateOffline, simulatedOffline: simOffline, standalone, canInstall, promptInstall }),
+    [authReady, user, userDoc, babies, baby, events, growth, moments, eventsReady, signIn, signOut, setActiveBaby, patchUser, toast, feedReminder, online, pendingCount, simulateOffline, simOffline, standalone, canInstall, promptInstall],
   );
 
   return (

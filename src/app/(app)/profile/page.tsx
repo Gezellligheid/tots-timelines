@@ -42,7 +42,7 @@ export default function ProfilePage() {
   const tc = useTranslations("common");
   const tOn = useTranslations("onboarding");
   const locale = useLocale();
-  const { user, userDoc, babies, baby, setActiveBaby, patchUser, signOut, toast, standalone, canInstall, promptInstall } = useApp();
+  const { user, userDoc, babies, baby, setActiveBaby, patchUser, signOut, toast, standalone, canInstall, promptInstall, online, simulateOffline, simulatedOffline } = useApp();
   const [ios, setIos] = useState(false);
   useEffect(() => setIos(/iphone|ipad|ipod/i.test(navigator.userAgent)), []);
   const [theme, setThemeState] = useState<"light" | "dark" | "auto">("auto");
@@ -162,6 +162,7 @@ export default function ProfilePage() {
   return (
     <div className="space-y-5 pt-2">
       <h1 className="text-3xl font-extrabold"><RevealText text={t("title")} /></h1>
+      {!online && <p className="rounded-[18px] bg-butter p-3 px-4 text-sm font-semibold text-butter-ink">{t("needsInternet")}</p>}
 
       <Section title={t("wrappedTitle")}>
         {(baby.wrappedAvailable ?? []).length ? (
@@ -189,6 +190,7 @@ export default function ProfilePage() {
               <Link href="/wrapped/demo?n=6" className="ghost-btn !h-10 !px-4 !text-sm">Months 4–6</Link>
               <Link href="/wrapped/demo?photos=0" className="ghost-btn !h-10 !px-4 !text-sm">No photos</Link>
               <Link href="/wrapped/demo?gate=1" className="ghost-btn !h-10 !px-4 !text-sm">“Ready” screen</Link>
+              <button className="ghost-btn !h-10 !px-4 !text-sm" onClick={() => simulateOffline(!simulatedOffline)}>{simulatedOffline ? "Go back online" : "Simulate offline"}</button>
             </div>
           </div>
         )}
@@ -235,7 +237,7 @@ export default function ProfilePage() {
         </div>
         {isOwner && (
           <>
-            <button className="pill-btn w-full" onClick={createInvite}><Icon name="link" size={20} />{t("invite")}</button>
+            <button className="pill-btn w-full" disabled={!online} onClick={createInvite}><Icon name="link" size={20} />{t("invite")}</button>
             {invite && (
               <div className="rounded-[20px] bg-surface2 p-4">
                 <p className="mb-2 text-sm text-soft">{t("inviteHint")}</p>
@@ -279,10 +281,10 @@ export default function ProfilePage() {
                 )}
               </div>
               <p className="text-xs text-soft">{t("familyHint")}</p>
-              {isOwner && <button className="py-1 text-sm font-bold text-blush-ink" onClick={() => familyAction("revoke")}>{t("familyStop")}</button>}
+              {isOwner && <button className="py-1 text-sm font-bold text-blush-ink disabled:opacity-40" disabled={!online} onClick={() => familyAction("revoke")}>{t("familyStop")}</button>}
             </>
           ) : isOwner ? (
-            <button className="pill-btn !h-12 w-full" onClick={() => familyAction("create")}>{t("familyCreate")}</button>
+            <button className="pill-btn !h-12 w-full" disabled={!online} onClick={() => familyAction("create")}>{t("familyCreate")}</button>
           ) : (
             <p className="text-xs text-soft">{t("familyOwnerOnly")}</p>
           )}
@@ -299,7 +301,7 @@ export default function ProfilePage() {
             <button className="ghost-btn w-full" onClick={async () => setPush(await pushState())}><Icon name="swap" size={18} />{t("checkAgain")}</button>
           </>
         )}
-        {push === "ready" && <button className="pill-btn w-full" onClick={turnOnPush}><Icon name="bell" size={20} />{t("remindersOn")}</button>}
+        {push === "ready" && <button className="pill-btn w-full" disabled={!online} onClick={turnOnPush}><Icon name="bell" size={20} />{t("remindersOn")}</button>}
         {push === "enabled" && (
           <>
             <p className="flex items-center gap-2 rounded-[18px] bg-mint p-3 px-4 text-sm font-bold text-mint-ink"><Icon name="check" size={18} />{t("enabled")}</p>
@@ -310,7 +312,7 @@ export default function ProfilePage() {
               </div>
               <div className="grid gap-2">
                 {([["basic", "bell", t("testBasic")], ["feed", "bottle", t("testFeed")], ["wrapped", "star", t("testWrapped")]] as const).map(([k, icon, label]) => (
-                  <button key={k} className="ghost-btn !h-12 w-full justify-start" disabled={testing !== null} onClick={() => void testPush(k)}>
+                  <button key={k} className="ghost-btn !h-12 w-full justify-start" disabled={testing !== null || !online} onClick={() => void testPush(k)}>
                     <Icon name={icon} size={18} />
                     <span className="flex-1 text-left">{label}</span>
                     {testing === k && <span className="text-xs font-bold text-soft">…</span>}
@@ -320,7 +322,7 @@ export default function ProfilePage() {
               {testMsg && <p className="text-center text-sm font-bold text-soft">{testMsg}</p>}
               <div className="border-t border-line pt-3">
                 <p className="mb-2 text-xs font-medium text-soft">{t("reenableHint")}</p>
-                <button className="ghost-btn !h-12 w-full justify-start" disabled={testing !== null} onClick={() => void reenable()}>
+                <button className="ghost-btn !h-12 w-full justify-start" disabled={testing !== null || !online} onClick={() => void reenable()}>
                   <Icon name="swap" size={18} />
                   <span className="flex-1 text-left">{t("reenable")}</span>
                   {testing === "reenable" && <span className="text-xs font-bold text-soft">…</span>}

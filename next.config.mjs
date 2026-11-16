@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import createNextIntlPlugin from "next-intl/plugin";
 import withSerwistInit from "@serwist/next";
 
@@ -6,6 +7,8 @@ const withSerwist = withSerwistInit({
   swSrc: "src/sw.ts",
   swDest: "public/sw.js",
   disable: process.env.NODE_ENV === "development",
+  // the page shown when something was never opened before and there is no connection
+  additionalPrecacheEntries: [{ url: "/offline", revision: process.env.VERCEL_GIT_COMMIT_SHA ?? randomUUID() }],
 });
 
 /** @type {import('next').NextConfig} */

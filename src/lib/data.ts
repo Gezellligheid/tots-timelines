@@ -1,8 +1,9 @@
 import { collection, deleteDoc, deleteField, doc, setDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "./firebase";
+import { isOnline } from "./net";
 import type { EventData, EventDoc, EventType } from "./types";
 
-export type NewEvent = { type: EventType; start: number; end?: number | null; data: EventData; note?: string; photoKey?: string };
+export type NewEvent = { type: EventType; start: number; end?: number | null; data: EventData; note?: string; photoKey?: string; photoPending?: boolean };
 
 /** Writes are fire-and-forget: Firestore applies them locally at once and syncs when online. */
 export function addEvent(babyId: string, ev: NewEvent, id?: string) {
@@ -29,11 +30,13 @@ export function removeEvent(babyId: string, id: string, type?: EventType) {
 }
 
 export function restoreEvent(babyId: string, e: EventDoc) {
-  const { id, ...rest } = e;
+  const { id, pending, ...rest } = e; // `pending` is client-only state
+  void pending;
   void setDoc(doc(db, "babies", babyId, "events", id), rest);
 }
 
 export async function api<T = unknown>(path: string, body?: unknown): Promise<T> {
+  if (!isOnline()) throw new Error("offline");
   const token = await auth.currentUser?.getIdToken();
   const res = await fetch(path, {
     method: body === undefined ? "GET" : "POST",

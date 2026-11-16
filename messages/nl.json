@@ -43,7 +43,8 @@
     "error": "Inloggen mislukt. Probeer het opnieuw.",
     "legal": "Door verder te gaan ga je akkoord met onze voorwaarden en privacyverklaring.",
     "disclaimer": "Tots & Timelines is een hulpmiddel om bij te houden, geen medisch advies.",
-    "invited": "Je bent uitgenodigd voor de tijdlijn van een baby. Log in om door te gaan."
+    "invited": "Je bent uitgenodigd voor de tijdlijn van een baby. Log in om door te gaan.",
+    "offline": "Je bent offline. Inloggen heeft internet nodig."
   },
   "onboarding": {
     "progress": "Stap {n} van {total}",
@@ -134,7 +135,8 @@
       "sub": "Alles staat klaar. Laten we de tijdlijn starten.",
       "cta": "Begin met bijhouden",
       "saving": "Even instellen…",
-      "error": "Opslaan mislukt. Probeer het opnieuw."
+      "error": "Opslaan mislukt. Probeer het opnieuw.",
+      "offline": "Je bent offline. Instellen heeft internet nodig."
     },
     "units": {
       "kg": "kg",
@@ -448,7 +450,8 @@
     "familyCreated": "Familielink gemaakt",
     "familyStopped": "Familielink uitgezet",
     "familyHint": "Alleen momenten die jij als gedeeld markeert staan er. Iedereen met de link kan ze zien, dus deel hem zorgvuldig.",
-    "familyOwnerOnly": "De eigenaar van deze baby kan de familielink maken."
+    "familyOwnerOnly": "De eigenaar van deze baby kan de familielink maken.",
+    "needsInternet": "Je bent offline. Sommige instellingen hebben internet nodig."
   },
   "join": {
     "title": "Aansluiten…",
@@ -505,7 +508,9 @@
       "firstSteps": "Eerste stapjes",
       "firstHaircut": "Eerste knipbeurt",
       "firstBirthday": "Eerste verjaardag"
-    }
+    },
+    "photoQueued": "Opgeslagen. De foto wordt geüpload zodra je weer online bent.",
+    "photoPending": "Foto wordt geüpload zodra je online bent"
   },
   "wrapped": {
     "title": "Wrapped",
@@ -662,5 +667,15 @@
     "closingTitle": "Op het volgende hoofdstuk",
     "closingBody": "Dank voor elke voeding, elke lange nacht en elke glimlach.",
     "empty": "Voeg eerst een paar momenten toe, dan vult je jaarboek zich."
+  },
+  "offline": {
+    "offline": "Offline",
+    "saved": "alles staat veilig op dit apparaat",
+    "waiting": "{n, plural, one {# wijziging} other {# wijzigingen}} wacht op synchronisatie",
+    "syncing": "{n, plural, one {# wijziging} other {# wijzigingen}} synchroniseren…",
+    "synced": "Alles gesynchroniseerd",
+    "pageTitle": "Je bent offline",
+    "pageBody": "Deze pagina staat nog niet op je apparaat. Je gegevens zijn veilig. Alles wat je logt wordt hier bewaard en synchroniseert vanzelf zodra je weer online bent.",
+    "retry": "Opnieuw proberen"
   }
 }

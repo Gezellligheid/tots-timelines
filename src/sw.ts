@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 import { defaultCache } from "@serwist/next/worker";
-import { NetworkOnly, Serwist, type PrecacheEntry, type SerwistGlobalConfig } from "serwist";
+import { ExpirationPlugin, NetworkFirst, NetworkOnly, Serwist, type PrecacheEntry, type SerwistGlobalConfig } from "serwist";
 
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -8,6 +8,8 @@ declare global {
   }
 }
 declare const self: ServiceWorkerGlobalScope;
+
+const PAGES = "tt-pages";
 
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
@@ -17,10 +19,25 @@ const serwist = new Serwist({
   runtimeCaching: [
     // never cache Firebase's auth handler or our private API/media responses
     { matcher: ({ url }) => url.pathname.startsWith("/__/") || url.pathname.startsWith("/api/"), handler: new NetworkOnly() },
+    // App pages and their Next.js data: the network first (3 s), the last copy when offline.
+    // The page itself loads its data from the on-device Firestore cache, so a cached shell is a working app.
+    {
+      matcher: ({ request, sameOrigin }) => sameOrigin && (request.mode === "navigate" || request.headers.get("RSC") === "1"),
+      handler: new NetworkFirst({ cacheName: PAGES, networkTimeoutSeconds: 3, plugins: [new ExpirationPlugin({ maxEntries: 80 })] }),
+    },
     ...defaultCache,
   ],
+  // a page that was never opened and there is no connection
+  fallbacks: {
+    entries: [{ url: "/offline", matcher: ({ request }) => request.destination === "document" }],
+  },
 });
 serwist.addEventListeners();
+
+// A new version brings new script files: drop old page copies so they never point at missing files
+self.addEventListener("activate", (event) => {
+  event.waitUntil(caches.delete(PAGES));
+});
 
 /* ---- Web Push (works on iOS 16.4+ for the installed PWA) ---- */
 self.addEventListener("push", (event) => {

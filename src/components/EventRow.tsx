@@ -69,6 +69,7 @@ export function EventRow({ e, units, onClick }: { e: EventDoc; units: Units; onC
         {e.note && <span className="block truncate text-xs italic text-soft">“{e.note}”</span>}
       </span>
       <span className="flex items-center gap-2">
+        {e.pending && <Icon name="cloudOff" size={14} className="text-soft" aria-label="Waiting to sync" />}
         {multi && <MemberAvatar uid={e.createdBy} size={22} />}
         <span className="text-sm font-semibold text-soft tabular-nums">{clock(e.start, locale)}</span>
       </span>

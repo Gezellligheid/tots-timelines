@@ -11,6 +11,8 @@ import { Skeleton } from "@/components/ui";
 import { WrappedGate } from "@/components/WrappedGate";
 import { FeedReminderPrompt } from "@/components/FeedReminder";
 import { MemberSync } from "@/components/MemberSync";
+import { SyncStatus } from "@/components/SyncStatus";
+import { OfflineWarmup } from "@/components/OfflineWarmup";
 
 const TABS: { href: string; icon: IconName; key: "home" | "insights" | "timeline" | "profile" }[] = [
   { href: "/home", icon: "home", key: "home" },
@@ -45,12 +47,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <div className="mx-auto min-h-dvh w-full max-w-[520px]">
       {ready ? (
         <>
+          <SyncStatus />
           <motion.main key={path} initial={{ clipPath: "inset(0 0 100% 0)", opacity: 0.6 }} animate={{ clipPath: "inset(0 0 0% 0)", opacity: 1 }} transition={{ duration: 0.5, ease: EASE }} className="px-5 pb-36 safe-t">
             {children}
           </motion.main>
           <WrappedGate />
           <FeedReminderPrompt />
           <MemberSync />
+          <OfflineWarmup />
           <nav className="fixed inset-x-0 bottom-0 z-50 mx-auto flex max-w-[520px] justify-center px-5 safe-b">
             <div className="relative flex w-full items-center justify-between rounded-full bg-ink p-2 shadow-2xl">
               {TABS.map((tab) => {

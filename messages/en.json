@@ -43,7 +43,8 @@
     "error": "Couldn't sign in. Please try again.",
     "legal": "By continuing you agree to our terms and privacy policy.",
     "disclaimer": "Tots & Timelines is a logging tool, not medical advice.",
-    "invited": "You've been invited to join a baby's timeline. Sign in to continue."
+    "invited": "You've been invited to join a baby's timeline. Sign in to continue.",
+    "offline": "You're offline. Signing in needs an internet connection."
   },
   "onboarding": {
     "progress": "Step {n} of {total}",
@@ -134,7 +135,8 @@
       "sub": "Everything is ready. Let's start the timeline.",
       "cta": "Start tracking",
       "saving": "Setting things up…",
-      "error": "Couldn't save. Please try again."
+      "error": "Couldn't save. Please try again.",
+      "offline": "You're offline. Setting up needs an internet connection."
     },
     "units": {
       "kg": "kg",
@@ -448,7 +450,8 @@
     "familyCreated": "Family link created",
     "familyStopped": "Family link turned off",
     "familyHint": "Only moments you mark as shared appear there. Anyone with the link can see them, so share it with care.",
-    "familyOwnerOnly": "The owner of this baby can create the family link."
+    "familyOwnerOnly": "The owner of this baby can create the family link.",
+    "needsInternet": "You're offline. Some settings need an internet connection."
   },
   "join": {
     "title": "Joining…",
@@ -505,7 +508,9 @@
       "firstSteps": "First steps",
       "firstHaircut": "First haircut",
       "firstBirthday": "First birthday"
-    }
+    },
+    "photoQueued": "Saved. The photo uploads when you're back online.",
+    "photoPending": "Photo uploads when online"
   },
   "wrapped": {
     "title": "Wrapped",
@@ -662,5 +667,15 @@
     "closingTitle": "Here's to the next chapter",
     "closingBody": "Thank you for every feed, every long night and every smile.",
     "empty": "Add a few moments first and your year book will fill up."
+  },
+  "offline": {
+    "offline": "Offline",
+    "saved": "everything is saved on this device",
+    "waiting": "{n, plural, one {# change} other {# changes}} waiting to sync",
+    "syncing": "Syncing {n, plural, one {# change} other {# changes}}…",
+    "synced": "All synced",
+    "pageTitle": "You're offline",
+    "pageBody": "This page isn't saved on your device yet. Your data is safe. Anything you log is stored here and syncs by itself once you're back online.",
+    "retry": "Try again"
   }
 }

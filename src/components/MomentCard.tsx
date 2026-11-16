@@ -31,9 +31,15 @@ export function MomentCard({ e, onClick }: { e: EventDoc; onClick?: () => void }
   return (
     <Tag onClick={onClick} className="block w-full overflow-hidden rounded-[28px] bg-surface text-left shadow-[var(--shadow)]">
       {e.photoKey && <PhotoImage photoKey={e.photoKey} className="aspect-[4/3] w-full" />}
-      <div className={`p-4 ${e.photoKey ? "" : "bg-sky"}`}>
+      {!e.photoKey && e.photoPending && (
+        <div className="flex aspect-[4/3] w-full flex-col items-center justify-center gap-2 bg-sky text-sky-ink">
+          <Icon name="image" size={34} />
+          <span className="text-sm font-bold">{tm("photoPending")}</span>
+        </div>
+      )}
+      <div className={`p-4 ${e.photoKey || e.photoPending ? "" : "bg-sky"}`}>
         <div className="flex items-center gap-3">
-          {!e.photoKey && (
+          {!e.photoKey && !e.photoPending && (
             <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-surface text-sky-ink"><Icon name="star" size={24} /></span>
           )}
           <div className="min-w-0 flex-1">

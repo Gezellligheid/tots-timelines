@@ -14,6 +14,7 @@ import { LangToggle } from "@/components/LangToggle";
 import { DateField } from "@/components/DatePicker";
 import { TakePhotoButton } from "@/components/CameraSheet";
 import { uploadPhoto } from "@/lib/media";
+import { isOnline } from "@/lib/net";
 import { nextWrappedAt } from "@/lib/wrapped";
 import { defaultUnits } from "@/lib/units";
 import { ACCENTS, type AccentName, type Baby, type FeedingType, type Role, type Sex, type Units, type UserDoc } from "@/lib/types";
@@ -122,6 +123,10 @@ export function Onboarding({ mode }: { mode: Mode }) {
 
   const finish = async () => {
     if (saveStarted.current || !user) return;
+    if (!isOnline()) {
+      setSaving("error");
+      return;
+    }
     saveStarted.current = true;
     setSaving("saving");
     try {
@@ -313,7 +318,7 @@ export function Onboarding({ mode }: { mode: Mode }) {
             <motion.div initial={{ clipPath: "circle(0% at 50% 50%)" }} animate={{ clipPath: "circle(100% at 50% 50%)" }} transition={{ duration: 1.1, ease: EASE }} className={`grid h-48 w-48 place-items-center overflow-hidden rounded-full bg-${draft.color} text-${draft.color}-ink`}>
               {photoPreview ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={photoPreview} alt="" className="h-full w-full object-cover" /> : <Icon name="baby" size={104} />}
             </motion.div>
-            <p className="mt-8 text-lg font-semibold text-soft">{saving === "error" ? t("finish.error") : saving === "done" ? t("finish.sub") : t("finish.saving")}</p>
+            <p className="mt-8 text-lg font-semibold text-soft">{saving === "error" ? (isOnline() ? t("finish.error") : t("finish.offline")) : saving === "done" ? t("finish.sub") : t("finish.saving")}</p>
             {saving === "error" && <button className="ghost-btn mt-4" onClick={() => void finish()}>{tc("continue")}</button>}
           </div>
         );

@@ -18,7 +18,7 @@ const FLOATERS: { icon: IconName; tone: string; x: string; y: string; d: number;
 export default function LoginPage() {
   const t = useTranslations("login");
   const router = useRouter();
-  const { authReady, user, userDoc, signIn } = useApp();
+  const { authReady, user, userDoc, signIn, online } = useApp();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [invited, setInvited] = useState(false);
@@ -97,10 +97,11 @@ export default function LoginPage() {
           {invited ? t("invited") : t("sub")}
         </motion.p>
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2, duration: 0.7, ease: EASE }} className="mt-6">
-          <button className="pill-btn w-full" onClick={go} disabled={busy || !authReady}>
+          <button className="pill-btn w-full" onClick={go} disabled={busy || !authReady || !online}>
             <span className="grid h-8 w-8 place-items-center rounded-full bg-white"><GoogleG size={18} /></span>
             {busy ? t("signing") : t("google")}
           </button>
+          {!online && <p className="mt-3 text-center text-sm font-semibold text-butter-ink">{t("offline")}</p>}
           {err && (
             <p className="mt-3 text-center text-sm font-semibold text-blush-ink">
               {t("error")}
