@@ -189,7 +189,24 @@
       "dayNight": "{pct}% of sleep happens at night",
       "welcome": "Log a few moments and we'll start spotting {name}'s rhythm."
     },
-    "lastTemp": "Last temp {t} · {ago} ago"
+    "lastTemp": "Last temp {t} · {ago} ago",
+    "predict": {
+      "feed": "Next feed ≈ {time}",
+      "feedDue": "Feed due about now",
+      "nap": "Nap ≈ {time}",
+      "napNow": "Nap window is open"
+    },
+    "streak": {
+      "days": "{n} days in a row",
+      "badge7": "7 days in a row! Lovely consistency.",
+      "badge14": "14 days in a row! You two are on a roll.",
+      "badge30": "30 days in a row! That's a whole month of care."
+    },
+    "onThisDay": {
+      "weeks": "{n, plural, one {# week} other {# weeks}} ago today",
+      "months": "{n, plural, one {# month} other {# months}} ago today",
+      "days100": "100 days ago today"
+    }
   },
   "log": {
     "feed": "Feeding",
@@ -261,7 +278,10 @@
       "normal": "Normal",
       "raised": "Slightly raised",
       "fever": "Fever"
-    }
+    },
+    "sideHint": "Last time: {last}. Suggested: {next}.",
+    "sharedToggle": "Show on the family page",
+    "vitaminDefault": "Vitamin D"
   },
   "timeline": {
     "title": "Timeline",
@@ -408,7 +428,27 @@
     "reenableHint": "Not receiving anything? This resets this device's registration and asks for permission again.",
     "reenabled": "Notifications re-enabled on this device",
     "checkAgain": "I've allowed it, check again",
-    "unblockHint": "Tap the lock icon next to the address (or the app's settings on your phone), set Notifications to Allow, then check again."
+    "unblockHint": "Tap the lock icon next to the address (or the app's settings on your phone), set Notifications to Allow, then check again.",
+    "nightMode": "Night mode (22:00 to 06:00)",
+    "nightHint": "Warm, very dim colours at night",
+    "vitaminTitle": "Daily vitamin",
+    "vitaminTrack": "Track a daily vitamin",
+    "vitaminName": "Name",
+    "vitaminHint": "Both parents see whether it has been given today, and the daily reminder stays quiet once it is.",
+    "shareTitle": "Share & keepsakes",
+    "reportTitle": "Doctor visit report",
+    "reportSub": "A summary to print or save as PDF",
+    "yearbookTitle": "Year book",
+    "yearbookSub": "A keepsake of the first year",
+    "familyTitle": "Family page",
+    "familySub": "A private link for grandparents and friends",
+    "familyCreate": "Create family link",
+    "familyStop": "Stop sharing",
+    "familyShare": "Share",
+    "familyCreated": "Family link created",
+    "familyStopped": "Family link turned off",
+    "familyHint": "Only moments you mark as shared appear there. Anyone with the link can see them, so share it with care.",
+    "familyOwnerOnly": "The owner of this baby can create the family link."
   },
   "join": {
     "title": "Joining…",
@@ -535,5 +575,92 @@
     "iosNote": "On iPhone, install the app first (Share, then Add to Home Screen) to receive notifications.",
     "turnOff": "Turn off reminder",
     "every": "Every"
+  },
+  "vitamin": {
+    "defaultName": "Vitamin D",
+    "given": "{name} given at {time}",
+    "markBtn": "Give {name}",
+    "markHint": "Tap when it's been given",
+    "marked": "{name} marked as given"
+  },
+  "family": {
+    "title": "{name}'s family page",
+    "sub": "{age} old",
+    "empty": "Nothing has been shared yet. Check back soon!",
+    "footer": "Shared with love · Tots & Timelines"
+  },
+  "report": {
+    "title": "Doctor visit summary",
+    "back": "Back",
+    "print": "Print or save as PDF",
+    "range7": "7 days",
+    "range14": "14 days",
+    "range30": "30 days",
+    "period": "Last {n} days",
+    "forBaby": "Born {date} · {age} old",
+    "overview": "Overview",
+    "feeding": "Feeding",
+    "sleep": "Sleep",
+    "diapers": "Diapers",
+    "temperature": "Temperature",
+    "growth": "Growth",
+    "vitamin": "Given",
+    "dailyLog": "Day by day",
+    "questions": "Questions for the doctor",
+    "questionsPh": "Write down what you want to ask…",
+    "feedsPerDay": "Feeds per day",
+    "avgGap": "Average time between feeds",
+    "bottlePerDay": "Bottle milk per day",
+    "breastPerDay": "Breastfeeding per day",
+    "sleepPerDay": "Sleep per day",
+    "longestStretch": "Longest stretch",
+    "napsPerDay": "Naps per day",
+    "wetPerDay": "Wet diapers per day",
+    "dirtyPerDay": "Dirty diapers per day",
+    "stoolColours": "Stool colours",
+    "highest": "Highest temperature",
+    "fever": "Fever",
+    "given": "{n} of {days} days",
+    "date": "Date",
+    "value": "Value",
+    "method": "Method",
+    "age": "Age",
+    "weight": "Weight",
+    "length": "Length",
+    "head": "Head",
+    "feedsCol": "Feeds",
+    "sleepCol": "Sleep",
+    "wetCol": "Wet",
+    "dirtyCol": "Dirty",
+    "hoursShort": "h",
+    "minShort": "min",
+    "monthsShort": "mo",
+    "disclaimer": "This summary is based on the parents' own logs. It is not medical advice or a diagnosis.",
+    "created": "Created {date} with Tots & Timelines"
+  },
+  "yearbook": {
+    "back": "Back",
+    "print": "Print or save as PDF",
+    "tip": "Choose “Save as PDF” and turn on background graphics.",
+    "loading": "Putting your year book together…",
+    "coverTitle": "{name}'s first year",
+    "coverSoFar": "{name}'s first months so far",
+    "numbersTitle": "The year in numbers",
+    "feedsLabel": "feeds",
+    "diapersLabel": "diapers",
+    "sleepHours": "hours of sleep",
+    "daysLogged": "days logged",
+    "litres": "litres of bottle milk",
+    "breastHours": "hours of breastfeeding",
+    "funDiapers": "Laid end to end, the diapers would make a {m} metre road.",
+    "funSleep": "That is {d} full days of sleep.",
+    "growthTitle": "Growing up",
+    "weight": "Weight",
+    "length": "Length",
+    "head": "Head",
+    "monthTitle": "Month {n}",
+    "closingTitle": "Here's to the next chapter",
+    "closingBody": "Thank you for every feed, every long night and every smile.",
+    "empty": "Add a few moments first and your year book will fill up."
   }
 }

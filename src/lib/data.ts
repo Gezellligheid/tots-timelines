@@ -1,4 +1,4 @@
-import { collection, deleteDoc, doc, setDoc, updateDoc } from "firebase/firestore";
+import { collection, deleteDoc, deleteField, doc, setDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "./firebase";
 import type { EventData, EventDoc, EventType } from "./types";
 
@@ -12,6 +12,7 @@ export function addEvent(babyId: string, ev: NewEvent, id?: string) {
   if (ev.type === "feed" && ev.data.method !== "pump") {
     void updateDoc(doc(db, "babies", babyId), { lastFeedAt: ev.end ?? ev.start });
   }
+  if (ev.type === "supplement") void updateDoc(doc(db, "babies", babyId), { lastSupplementAt: ev.start });
   return ref.id;
 }
 
@@ -21,8 +22,10 @@ export function patchEvent(babyId: string, id: string, patch: Partial<NewEvent>,
   if (patch.end && type === "feed") void updateDoc(doc(db, "babies", babyId), { lastFeedAt: patch.end }).catch(() => {});
 }
 
-export function removeEvent(babyId: string, id: string) {
+export function removeEvent(babyId: string, id: string, type?: EventType) {
   void deleteDoc(doc(db, "babies", babyId, "events", id));
+  // undoing today's vitamin must not leave "given today" behind (the daily reminder checks it)
+  if (type === "supplement") void updateDoc(doc(db, "babies", babyId), { lastSupplementAt: deleteField() }).catch(() => {});
 }
 
 export function restoreEvent(babyId: string, e: EventDoc) {

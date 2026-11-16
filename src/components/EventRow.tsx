@@ -3,6 +3,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Icon } from "./Icon";
 import { TYPE_META } from "@/lib/meta";
 import { useMomentTitle } from "./MomentCard";
+import { MemberAvatar, useMultiParent } from "./MemberAvatar";
 import { clock } from "@/lib/format";
 import { fmtDur, duration } from "@/lib/stats";
 import { fmtLength, fmtVolume, fmtWeight } from "@/lib/units";
@@ -35,6 +36,8 @@ export function useDescribe(units: Units) {
         const title = tt(d.kind === "dirty" ? "diaperDirty" : d.kind === "mixed" ? "diaperMixed" : "diaperWet");
         return { title, sub: d.color ? tl(`color.${d.color}`) : "" };
       }
+      case "supplement":
+        return { title: d.title || tl("vitaminDefault"), sub: "" };
       case "temperature":
         return { title: tt("tempTitle"), sub: [fmtTemp(d.tempC, units), d.tempMethod ? tl(`temp.${d.tempMethod}`) : ""].filter(Boolean).join(" · ") };
       case "moment":
@@ -51,6 +54,7 @@ export function useDescribe(units: Units) {
 export function EventRow({ e, units, onClick }: { e: EventDoc; units: Units; onClick?: () => void }) {
   const locale = useLocale();
   const describe = useDescribe(units);
+  const multi = useMultiParent();
   const { title, sub } = describe(e);
   const meta = TYPE_META[e.type];
   const Tag = onClick ? "button" : "div";
@@ -64,7 +68,10 @@ export function EventRow({ e, units, onClick }: { e: EventDoc; units: Units; onC
         {sub && <span className="block truncate text-sm text-soft">{sub}</span>}
         {e.note && <span className="block truncate text-xs italic text-soft">“{e.note}”</span>}
       </span>
-      <span className="text-sm font-semibold text-soft tabular-nums">{clock(e.start, locale)}</span>
+      <span className="flex items-center gap-2">
+        {multi && <MemberAvatar uid={e.createdBy} size={22} />}
+        <span className="text-sm font-semibold text-soft tabular-nums">{clock(e.start, locale)}</span>
+      </span>
     </Tag>
   );
 }

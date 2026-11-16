@@ -36,7 +36,10 @@ export interface Baby {
   photoKey?: string;
   ownerUid: string;
   memberUids: string[];
-  members?: Record<string, { name: string; role?: Role }>;
+  members?: Record<string, { name: string; role?: Role; photoURL?: string }>;
+  vitamin?: { enabled: boolean; name: string }; // daily vitamin tracker, shared by both parents
+  lastSupplementAt?: number;
+  familyToken?: string; // public read-only family page
   lastFeedAt?: number;
   // Wrapped bookkeeping (server decides readiness)
   nextWrappedAt?: number;
@@ -46,7 +49,7 @@ export interface Baby {
   wrappedPushedN?: number;
 }
 
-export type EventType = "feed" | "sleep" | "diaper" | "growth" | "moment" | "temperature";
+export type EventType = "feed" | "sleep" | "diaper" | "growth" | "moment" | "temperature" | "supplement";
 
 export interface EventData {
   method?: "breast" | "bottle" | "pump" | "solid";
@@ -61,6 +64,7 @@ export interface EventData {
   headCm?: number;
   milestone?: string; // key from lib/milestones
   title?: string; // custom title for a moment
+  shared?: boolean; // moment visible on the family page
   tempC?: number; // temperature, always stored in °C
   tempMethod?: "forehead" | "ear" | "armpit" | "rectal";
 }

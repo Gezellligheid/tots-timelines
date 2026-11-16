@@ -11,6 +11,7 @@ import { uploadPhoto } from "@/lib/media";
 import { MILESTONES } from "@/lib/milestones";
 import { TakePhotoButton } from "./CameraSheet";
 import { TempWheel } from "./Wheel";
+import { Toggle } from "./Toggle";
 import { fmtTemp, tempStatus } from "@/lib/temp";
 import { TYPE_META } from "@/lib/meta";
 import { DateTimeField } from "./DatePicker";
@@ -38,7 +39,7 @@ function Body({ type, onClose }: { type: EventType; onClose: () => void }) {
   const t = useTranslations("log");
   const tc = useTranslations("common");
   const tm = useTranslations("moments");
-  const { baby, userDoc, toast, moments } = useApp();
+  const { baby, userDoc, toast, moments, events } = useApp();
   const units = userDoc?.units ?? "metric";
   const meta = TYPE_META[type];
   const [when, setWhen] = useState(() => Date.now());
@@ -56,7 +57,13 @@ function Body({ type, onClose }: { type: EventType; onClose: () => void }) {
     }
   }, [baby?.feedingType]);
   const [method, setMethod] = useState<Method>(methods[0]);
-  const [side, setSide] = useState<"left" | "right" | "both">("left");
+  // breast: suggest the side opposite to the last one
+  const lastSide = useMemo(
+    () => events.filter((e) => e.type === "feed" && e.data.method === "breast" && (e.data.side === "left" || e.data.side === "right")).sort((a, b) => b.start - a.start)[0]?.data.side as "left" | "right" | undefined,
+    [events],
+  );
+  const suggestedSide: "left" | "right" = lastSide === "left" ? "right" : "left";
+  const [side, setSide] = useState<"left" | "right" | "both">(suggestedSide);
   const [ml, setMl] = useState(90);
   const [milk, setMilk] = useState<"breast" | "formula">(baby?.feedingType === "bottle" ? "formula" : "breast");
   const [food, setFood] = useState("");
@@ -89,6 +96,7 @@ function Body({ type, onClose }: { type: EventType; onClose: () => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [shared, setShared] = useState(false);
   const sorted = useMemo(() => {
     const done = new Set(moments.map((m) => m.data.milestone).filter(Boolean));
     const age = baby ? ageMonths(baby.birthDate, Date.now(), baby.gestationWeeks) : 0;
@@ -170,7 +178,7 @@ function Body({ type, onClose }: { type: EventType; onClose: () => void }) {
         type: "moment",
         start: when,
         end: when,
-        data: { kind: mmode, ...(isMs && msKey ? { milestone: msKey } : {}), ...(title ? { title } : {}) },
+        data: { kind: mmode, ...(isMs && msKey ? { milestone: msKey } : {}), ...(title ? { title } : {}), ...(shared && baby.familyToken ? { shared: true } : {}) },
         note: trimNote,
         photoKey,
       });
@@ -228,6 +236,7 @@ function Body({ type, onClose }: { type: EventType; onClose: () => void }) {
                   <Chip key={s} active={side === s} onClick={() => setSide(s)}>{t(s)}</Chip>
                 ))}
               </div>
+              {method === "breast" && lastSide && <p className="mt-2 px-1 text-xs font-semibold text-soft">{t("sideHint", { last: t(lastSide), next: t(suggestedSide) })}</p>}
             </div>
           )}
           {(method === "bottle" || method === "pump") && (
@@ -389,6 +398,12 @@ function Body({ type, onClose }: { type: EventType; onClose: () => void }) {
               <label className="ghost-btn flex-1 cursor-pointer !px-3"><Icon name="image" size={20} />{tc("add")}<input type="file" accept="image/*" hidden onChange={(e) => pickPhoto(e.target.files?.[0])} /></label>
             </div>
           </div>
+          {baby.familyToken && (
+            <div className="flex items-center justify-between gap-3 rounded-[20px] bg-surface2 p-3 px-4">
+              <span className="text-sm font-semibold">{t("sharedToggle")}</span>
+              <Toggle on={shared} onChange={setShared} label={t("sharedToggle")} />
+            </div>
+          )}
           {timePicker}
           <button className="pill-btn w-full" disabled={busy} onClick={saveMoment}>{busy ? tm("saving") : tc("save")}</button>
         </>

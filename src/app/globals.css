@@ -145,3 +145,58 @@ body {
 /* no native spinner arrows on number inputs */
 input[type=number] { -moz-appearance: textfield; appearance: textfield; }
 input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* Night mode: very dim, warm amber tones (little blue light) for 3 a.m. logging */
+:root[data-theme="night"] {
+  --bg: #0f0a09;
+  --surface: #1a1210;
+  --surface-2: #231815;
+  --ink: #efcfae;
+  --soft: #a98c76;
+  --line: rgba(239, 207, 174, 0.1);
+  --blush: #3a2420;
+  --butter: #392f17;
+  --mint: #1f3328;
+  --lavender: #2f2638;
+  --peach: #3d2a1a;
+  --sky: #22302e;
+  --blush-ink: #e8a38c;
+  --butter-ink: #e6c36c;
+  --mint-ink: #94cfa8;
+  --lavender-ink: #c9aee0;
+  --peach-ink: #f0b282;
+  --sky-ink: #a9c9c0;
+  --shadow: 0 10px 40px -12px rgba(0, 0, 0, 0.7);
+  color-scheme: dark;
+}
+
+/* Printed pages (doctor report, year book) are always light, whatever theme is on */
+.force-light {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f6f4ee;
+  --ink: #17171a;
+  --soft: #6b6b73;
+  --line: rgba(23, 23, 26, 0.12);
+  --blush: #f4d6d2;
+  --butter: #fbe9a6;
+  --mint: #cde8e0;
+  --lavender: #cfd3f8;
+  --peach: #fad9be;
+  --sky: #cfe6f4;
+  --blush-ink: #b5524a;
+  --butter-ink: #946d0b;
+  --mint-ink: #2d7a66;
+  --lavender-ink: #4a52b8;
+  --peach-ink: #b0622a;
+  --sky-ink: #2d6c94;
+  --shadow: none;
+  background: #fff;
+  color: #17171a;
+}
+@media print {
+  html, body { background: #fff !important; }
+  .no-print { display: none !important; }
+  .print-keep { break-inside: avoid; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

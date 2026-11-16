@@ -10,7 +10,8 @@ import { EventRow } from "@/components/EventRow";
 import { Icon } from "@/components/Icon";
 import { MomentCard } from "@/components/MomentCard";
 import { EASE, RevealText } from "@/components/motion";
-import { removeEvent, restoreEvent } from "@/lib/data";
+import { patchEvent, removeEvent, restoreEvent } from "@/lib/data";
+import { Toggle } from "@/components/Toggle";
 import { byDay, startOfDay, DAY } from "@/lib/stats";
 import type { EventDoc, EventType } from "@/lib/types";
 
@@ -39,6 +40,7 @@ function LoadingDots() {
 export default function TimelinePage() {
   const t = useTranslations("timeline");
   const tc = useTranslations("common");
+  const tl = useTranslations("log");
   const locale = useLocale();
   const { baby, events, growth, moments, userDoc, toast, eventsReady } = useApp();
   const [filter, setFilter] = useState<Filter>("all");
@@ -133,7 +135,7 @@ export default function TimelinePage() {
   const del = () => {
     if (!sel) return;
     const e = sel;
-    removeEvent(baby.id, e.id);
+    removeEvent(baby.id, e.id, e.type);
     setOlder((prev) => prev.filter((x) => x.id !== e.id));
     setSel(null);
     toast(t("deleted"), { label: tc("undo"), run: () => restoreEvent(baby.id, e) });
@@ -185,6 +187,19 @@ export default function TimelinePage() {
         {sel && (
           <div className="space-y-4">
             {sel.type === "moment" ? <MomentCard e={sel} /> : <EventRow e={sel} units={units} />}
+            {sel.type === "moment" && baby.familyToken && (
+              <div className="flex items-center justify-between gap-3 rounded-[20px] bg-surface2 p-3 px-4">
+                <span className="text-sm font-semibold">{tl("sharedToggle")}</span>
+                <Toggle
+                  on={!!sel.data.shared}
+                  label={tl("sharedToggle")}
+                  onChange={(v) => {
+                    patchEvent(baby.id, sel.id, { data: { ...sel.data, shared: v } });
+                    setSel({ ...sel, data: { ...sel.data, shared: v } });
+                  }}
+                />
+              </div>
+            )}
             <p className="text-center font-semibold">{t("deleteQ")}</p>
             <div className="flex gap-3">
               <button className="ghost-btn flex-1" onClick={() => setSel(null)}>{tc("cancel")}</button>

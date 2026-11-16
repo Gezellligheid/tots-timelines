@@ -2,6 +2,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { Icon } from "./Icon";
 import { PhotoImage } from "./ui";
+import { MemberAvatar, useMultiParent } from "./MemberAvatar";
 import { useApp } from "@/providers/Providers";
 import { ageText } from "@/lib/format";
 import type { EventDoc } from "@/lib/types";
@@ -22,6 +23,7 @@ export function MomentCard({ e, onClick }: { e: EventDoc; onClick?: () => void }
   const tAge = useTranslations("age");
   const locale = useLocale();
   const { baby } = useApp();
+  const multi = useMultiParent();
   const title = useMomentTitle()(e);
   const isMilestone = !!e.data.milestone || e.data.kind === "milestone";
   const when = new Date(e.start);
@@ -43,9 +45,10 @@ export function MomentCard({ e, onClick }: { e: EventDoc; onClick?: () => void }
           </div>
         </div>
         {e.note && <p className="mt-2 text-[15px] leading-relaxed text-ink/80">{e.note}</p>}
-        <p className="mt-2 text-xs font-semibold text-soft">
+        <p className="mt-2 flex items-center gap-2 text-xs font-semibold text-soft">
           {when.toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" })}
           {baby && ` · ${ageText(baby.birthDate, tAge, when)}`}
+          {multi && <MemberAvatar uid={e.createdBy} size={20} />}
         </p>
       </div>
     </Tag>

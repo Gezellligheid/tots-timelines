@@ -65,6 +65,8 @@ export async function GET(req: Request) {
       sent += n;
     } else if (r.type === "daily") {
       if (!r.time || r.time !== lp.hm || r.lastSentDay === lp.day) continue;
+      // the baby's daily vitamin was already given today: nothing to remind about
+      if (b.vitamin?.enabled && b.vitamin.name === r.label && b.lastSupplementAt && localParts(b.lastSupplementAt, tz).day === lp.day) continue;
       const n = await sendToUser(r.ownerUid, { title: r.label || "Reminder", body: b.name, url: "/home", tag: `daily-${d.id}` });
       await d.ref.update({ lastSentDay: lp.day });
       sent += n;

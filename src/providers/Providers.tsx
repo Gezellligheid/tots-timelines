@@ -12,6 +12,7 @@ import {
 } from "firebase/auth";
 import { collection, doc, onSnapshot, orderBy, query, where, updateDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
+import { applyTheme } from "@/lib/locale";
 import type { Baby, EventDoc, Reminder, UserDoc } from "@/lib/types";
 import { DAY } from "@/lib/stats";
 
@@ -178,6 +179,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
       onErr("feedReminder"),
     );
   }, [uid, babyId]);
+
+  // Night mode switches itself on and off at 22:00 / 06:00 without a reload
+  useEffect(() => {
+    const id = setInterval(applyTheme, 60000);
+    return () => clearInterval(id);
+  }, []);
 
   // Per-baby accent colour
   useEffect(() => {

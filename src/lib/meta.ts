@@ -8,4 +8,5 @@ export const TYPE_META: Record<EventType, { icon: IconName; tone: AccentName }> 
   diaper: { icon: "diaper", tone: "lavender" },
   moment: { icon: "star", tone: "sky" },
   temperature: { icon: "thermo", tone: "peach" },
+  supplement: { icon: "pill", tone: "mint" },
 };

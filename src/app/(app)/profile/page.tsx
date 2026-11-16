@@ -9,13 +9,14 @@ import { BabyAvatar, Chip, Sheet } from "@/components/ui";
 import { Icon } from "@/components/Icon";
 import { RevealText, WipeIn } from "@/components/motion";
 import { LangToggle } from "@/components/LangToggle";
+import { Toggle } from "@/components/Toggle";
 import { Stepper } from "@/components/forms";
 import { TakePhotoButton } from "@/components/CameraSheet";
 import { DateField, TimeField } from "@/components/DatePicker";
 import { api } from "@/lib/data";
 import { uploadPhoto } from "@/lib/media";
 import { nextWrappedAt, wrappedKey } from "@/lib/wrapped";
-import { currentTheme, setTheme } from "@/lib/locale";
+import { currentTheme, getAutoNight, setAutoNight, setTheme } from "@/lib/locale";
 import { enablePush, pushState, resetPush, type PushState } from "@/lib/push";
 import { ACCENTS, type Baby, type FeedingType, type Reminder } from "@/lib/types";
 
@@ -35,13 +36,6 @@ const Row = ({ label, children }: { label: string; children: React.ReactNode }) 
     {children}
   </div>
 );
-function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <button role="switch" aria-checked={on} onClick={() => onChange(!on)} className={`relative h-8 w-14 rounded-full transition-colors duration-300 ${on ? "bg-ink" : "bg-line"}`}>
-      <span className="absolute top-1 h-6 w-6 rounded-full bg-white shadow transition-all duration-300" style={{ left: on ? 28 : 4 }} />
-    </button>
-  );
-}
 
 export default function ProfilePage() {
   const t = useTranslations("profile");
@@ -60,10 +54,13 @@ export default function ProfilePage() {
   const [testing, setTesting] = useState<string | null>(null);
   const [testMsg, setTestMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [autoNight, setAutoNightState] = useState(true);
+  const [vitName, setVitName] = useState("");
 
-  useEffect(() => { setThemeState(currentTheme()); pushState().then(setPush); }, []);
+  useEffect(() => { setThemeState(currentTheme()); setAutoNightState(getAutoNight()); pushState().then(setPush); }, []);
   const uid = user?.uid;
   const babyId = baby?.id;
+  useEffect(() => setVitName(baby?.vitamin?.name ?? ""), [baby?.vitamin?.name]);
   useEffect(() => {
     if (!uid || !babyId) return;
     return onSnapshot(query(collection(db, "reminders"), where("ownerUid", "==", uid), where("babyId", "==", babyId)), (s) =>
@@ -117,6 +114,17 @@ export default function ProfilePage() {
     }
     setTesting(null);
   };
+
+  const saveVitamin = (enabled: boolean, name = vitName) =>
+    void updateDoc(doc(db, "babies", baby.id), { vitamin: { enabled, name: name.trim() || t("dailyLabel") } });
+
+  const familyAction = async (action: "create" | "revoke") => {
+    try {
+      await api("/api/family", { babyId: baby.id, action });
+      toast(action === "create" ? t("familyCreated") : t("familyStopped"));
+    } catch { toast(tc("error")); }
+  };
+  const familyUrl = baby.familyToken ? `${window.location.origin}/family/${baby.familyToken}` : null;
 
   const createInvite = async () => {
     try {
@@ -239,6 +247,48 @@ export default function ProfilePage() {
         )}
       </Section>
 
+      <Section title={t("shareTitle")}>
+        {([
+          ["/report", "download", "peach", t("reportTitle"), t("reportSub")],
+          ["/yearbook", "star", "butter", t("yearbookTitle"), t("yearbookSub")],
+        ] as const).map(([href, icon, tone, title, sub]) => (
+          <Link key={href} href={href} className="flex items-center gap-3 rounded-[22px] bg-surface2 p-3 pr-4">
+            <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-full bg-${tone} text-${tone}-ink`}><Icon name={icon} size={22} /></span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-bold">{title}</span>
+              <span className="block text-xs font-medium text-soft">{sub}</span>
+            </span>
+            <Icon name="chevR" size={18} className="text-soft" />
+          </Link>
+        ))}
+        <div className="space-y-3 rounded-[22px] bg-surface2 p-3">
+          <div className="flex items-center gap-3">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-sky text-sky-ink"><Icon name="link" size={22} /></span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-bold">{t("familyTitle")}</span>
+              <span className="block text-xs font-medium text-soft">{t("familySub")}</span>
+            </span>
+          </div>
+          {familyUrl ? (
+            <>
+              <p className="break-all rounded-[16px] bg-surface p-3 text-xs font-bold">{familyUrl}</p>
+              <div className="flex gap-2">
+                <button className="ghost-btn !h-11 flex-1" onClick={() => navigator.clipboard.writeText(familyUrl).then(() => toast(tc("copied")))}><Icon name="copy" size={18} />{tc("copy")}</button>
+                {typeof navigator !== "undefined" && "share" in navigator && (
+                  <button className="ghost-btn !h-11 flex-1" onClick={() => navigator.share({ url: familyUrl, title: baby.name }).catch(() => {})}><Icon name="link" size={18} />{t("familyShare")}</button>
+                )}
+              </div>
+              <p className="text-xs text-soft">{t("familyHint")}</p>
+              {isOwner && <button className="py-1 text-sm font-bold text-blush-ink" onClick={() => familyAction("revoke")}>{t("familyStop")}</button>}
+            </>
+          ) : isOwner ? (
+            <button className="pill-btn !h-12 w-full" onClick={() => familyAction("create")}>{t("familyCreate")}</button>
+          ) : (
+            <p className="text-xs text-soft">{t("familyOwnerOnly")}</p>
+          )}
+        </div>
+      </Section>
+
       <Section title={t("reminders")}>
         {push === "ios-install" && <p className="rounded-[18px] bg-peach p-4 text-sm font-semibold">{t("remindersIos")}</p>}
         {push === "unsupported" && <p className="text-sm text-soft">{t("remindersUnsupported")}</p>}
@@ -299,6 +349,14 @@ export default function ProfilePage() {
         )}
       </Section>
 
+      <Section title={t("vitaminTitle")}>
+        <Row label={t("vitaminTrack")}><Toggle on={!!baby.vitamin?.enabled} label={t("vitaminTrack")} onChange={(v) => saveVitamin(v)} /></Row>
+        {baby.vitamin?.enabled && (
+          <input className="field !py-3 !text-base" value={vitName} placeholder={t("dailyLabel")} aria-label={t("vitaminName")} onChange={(e) => setVitName(e.target.value)} onBlur={() => saveVitamin(true)} />
+        )}
+        <p className="text-sm text-soft">{t("vitaminHint")}</p>
+      </Section>
+
       <Section title={t("you")}>
         <Row label={t("language")}><LangToggle onChange={(l) => void patchUser({ locale: l })} /></Row>
         <Row label={t("units")}>
@@ -314,6 +372,8 @@ export default function ProfilePage() {
             ))}
           </div>
         </Row>
+        <Row label={t("nightMode")}><Toggle on={autoNight} label={t("nightMode")} onChange={(v) => { setAutoNight(v); setAutoNightState(v); }} /></Row>
+        <p className="-mt-2 text-xs text-soft">{t("nightHint")}</p>
         <button className="ghost-btn w-full" onClick={exportData}><Icon name="download" size={18} />{t("export")}</button>
         <button className="ghost-btn w-full" onClick={() => signOut()}><Icon name="logout" size={18} />{t("signOut")}</button>
         {isOwner && <button className="w-full py-2 text-sm font-bold text-blush-ink" onClick={() => setConfirmDel(true)}>{t("deleteBaby")}</button>}

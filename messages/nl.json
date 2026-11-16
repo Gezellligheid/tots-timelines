@@ -189,7 +189,24 @@
       "dayNight": "{pct}% van de slaap is 's nachts",
       "welcome": "Log een paar momenten en we ontdekken het ritme van {name}."
     },
-    "lastTemp": "Laatste temp {t} · {ago} geleden"
+    "lastTemp": "Laatste temp {t} · {ago} geleden",
+    "predict": {
+      "feed": "Volgende voeding ≈ {time}",
+      "feedDue": "Voeding bijna aan de beurt",
+      "nap": "Dutje ≈ {time}",
+      "napNow": "Tijd voor een dutje"
+    },
+    "streak": {
+      "days": "{n} dagen op rij",
+      "badge7": "7 dagen op rij! Mooi volgehouden.",
+      "badge14": "14 dagen op rij! Jullie zitten lekker in de flow.",
+      "badge30": "30 dagen op rij! Een hele maand zorg."
+    },
+    "onThisDay": {
+      "weeks": "{n, plural, one {# week} other {# weken}} geleden vandaag",
+      "months": "{n, plural, one {# maand} other {# maanden}} geleden vandaag",
+      "days100": "100 dagen geleden vandaag"
+    }
   },
   "log": {
     "feed": "Voeding",
@@ -261,7 +278,10 @@
       "normal": "Normaal",
       "raised": "Licht verhoogd",
       "fever": "Koorts"
-    }
+    },
+    "sideHint": "Vorige keer: {last}. Voorstel: {next}.",
+    "sharedToggle": "Tonen op de familiepagina",
+    "vitaminDefault": "Vitamine D"
   },
   "timeline": {
     "title": "Tijdlijn",
@@ -408,7 +428,27 @@
     "reenableHint": "Komt er niets binnen? Dit zet de registratie van dit apparaat opnieuw op en vraagt opnieuw om toestemming.",
     "reenabled": "Meldingen opnieuw aangezet op dit apparaat",
     "checkAgain": "Ik heb het toegestaan, controleer opnieuw",
-    "unblockHint": "Tik op het slotje naast het adres (of de app-instellingen op je telefoon), zet Meldingen op Toestaan en controleer dan opnieuw."
+    "unblockHint": "Tik op het slotje naast het adres (of de app-instellingen op je telefoon), zet Meldingen op Toestaan en controleer dan opnieuw.",
+    "nightMode": "Nachtmodus (22:00 tot 06:00)",
+    "nightHint": "Warme, heel gedimde kleuren 's nachts",
+    "vitaminTitle": "Dagelijkse vitamine",
+    "vitaminTrack": "Een dagelijkse vitamine bijhouden",
+    "vitaminName": "Naam",
+    "vitaminHint": "Jullie zien allebei of hij vandaag al gegeven is, en de dagelijkse herinnering blijft stil als dat zo is.",
+    "shareTitle": "Delen & aandenkens",
+    "reportTitle": "Verslag voor de arts",
+    "reportSub": "Een samenvatting om te printen of als pdf op te slaan",
+    "yearbookTitle": "Jaarboek",
+    "yearbookSub": "Een aandenken aan het eerste jaar",
+    "familyTitle": "Familiepagina",
+    "familySub": "Een privélink voor opa's, oma's en vrienden",
+    "familyCreate": "Familielink maken",
+    "familyStop": "Stoppen met delen",
+    "familyShare": "Delen",
+    "familyCreated": "Familielink gemaakt",
+    "familyStopped": "Familielink uitgezet",
+    "familyHint": "Alleen momenten die jij als gedeeld markeert staan er. Iedereen met de link kan ze zien, dus deel hem zorgvuldig.",
+    "familyOwnerOnly": "De eigenaar van deze baby kan de familielink maken."
   },
   "join": {
     "title": "Aansluiten…",
@@ -535,5 +575,92 @@
     "iosNote": "Op iPhone: installeer eerst de app (Delen, dan Zet op beginscherm) om meldingen te ontvangen.",
     "turnOff": "Herinnering uitzetten",
     "every": "Elke"
+  },
+  "vitamin": {
+    "defaultName": "Vitamine D",
+    "given": "{name} gegeven om {time}",
+    "markBtn": "{name} geven",
+    "markHint": "Tik als het gegeven is",
+    "marked": "{name} als gegeven gemarkeerd"
+  },
+  "family": {
+    "title": "Familiepagina van {name}",
+    "sub": "{age} oud",
+    "empty": "Er is nog niets gedeeld. Kijk binnenkort weer!",
+    "footer": "Met liefde gedeeld · Tots & Timelines"
+  },
+  "report": {
+    "title": "Samenvatting voor de arts",
+    "back": "Terug",
+    "print": "Printen of opslaan als pdf",
+    "range7": "7 dagen",
+    "range14": "14 dagen",
+    "range30": "30 dagen",
+    "period": "Laatste {n} dagen",
+    "forBaby": "Geboren {date} · {age} oud",
+    "overview": "Overzicht",
+    "feeding": "Voeding",
+    "sleep": "Slaap",
+    "diapers": "Luiers",
+    "temperature": "Temperatuur",
+    "growth": "Groei",
+    "vitamin": "Gegeven",
+    "dailyLog": "Dag voor dag",
+    "questions": "Vragen voor de arts",
+    "questionsPh": "Schrijf op wat je wilt vragen…",
+    "feedsPerDay": "Voedingen per dag",
+    "avgGap": "Gemiddelde tijd tussen voedingen",
+    "bottlePerDay": "Flesvoeding per dag",
+    "breastPerDay": "Borstvoeding per dag",
+    "sleepPerDay": "Slaap per dag",
+    "longestStretch": "Langste blok",
+    "napsPerDay": "Dutjes per dag",
+    "wetPerDay": "Natte luiers per dag",
+    "dirtyPerDay": "Vieze luiers per dag",
+    "stoolColours": "Kleuren ontlasting",
+    "highest": "Hoogste temperatuur",
+    "fever": "Koorts",
+    "given": "{n} van {days} dagen",
+    "date": "Datum",
+    "value": "Waarde",
+    "method": "Methode",
+    "age": "Leeftijd",
+    "weight": "Gewicht",
+    "length": "Lengte",
+    "head": "Hoofd",
+    "feedsCol": "Voedingen",
+    "sleepCol": "Slaap",
+    "wetCol": "Nat",
+    "dirtyCol": "Vies",
+    "hoursShort": "u",
+    "minShort": "min",
+    "monthsShort": "mnd",
+    "disclaimer": "Deze samenvatting is gebaseerd op de eigen logs van de ouders. Het is geen medisch advies of diagnose.",
+    "created": "Gemaakt op {date} met Tots & Timelines"
+  },
+  "yearbook": {
+    "back": "Terug",
+    "print": "Printen of opslaan als pdf",
+    "tip": "Kies “Opslaan als pdf” en zet achtergrondafbeeldingen aan.",
+    "loading": "Je jaarboek wordt samengesteld…",
+    "coverTitle": "Het eerste jaar van {name}",
+    "coverSoFar": "De eerste maanden van {name} tot nu toe",
+    "numbersTitle": "Het jaar in cijfers",
+    "feedsLabel": "voedingen",
+    "diapersLabel": "luiers",
+    "sleepHours": "uur slaap",
+    "daysLogged": "dagen bijgehouden",
+    "litres": "liter flesvoeding",
+    "breastHours": "uur borstvoeding",
+    "funDiapers": "Achter elkaar gelegd vormen de luiers een weg van {m} meter.",
+    "funSleep": "Dat zijn {d} hele dagen slaap.",
+    "growthTitle": "Groeien maar",
+    "weight": "Gewicht",
+    "length": "Lengte",
+    "head": "Hoofd",
+    "monthTitle": "Maand {n}",
+    "closingTitle": "Op het volgende hoofdstuk",
+    "closingBody": "Dank voor elke voeding, elke lange nacht en elke glimlach.",
+    "empty": "Voeg eerst een paar momenten toe, dan vult je jaarboek zich."
   }
 }

@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useApp } from "@/providers/Providers";
 import { Icon } from "@/components/Icon";
 import { EASE, RevealText, WipeIn } from "@/components/motion";
@@ -13,7 +13,12 @@ import { WrappedCard } from "@/components/WrappedGate";
 import { fmtTemp } from "@/lib/temp";
 import { FeedReminderPill } from "@/components/FeedReminder";
 import { Donut } from "@/components/charts";
-import { ageText } from "@/lib/format";
+import { ageText, clock } from "@/lib/format";
+import { ageMonths } from "@/lib/growth";
+import { predictFeed, predictNap } from "@/lib/predict";
+import { VitaminRow } from "@/components/VitaminRow";
+import { OnThisDayCard } from "@/components/OnThisDayCard";
+import { StreakPill } from "@/components/StreakPill";
 import { patchEvent } from "@/lib/data";
 import { TYPE_META } from "@/lib/meta";
 import { DAY, dayNightSleep, feedIntervals, fmtAgo, fmtClock, fmtDur, isRunning, longestSleep, sleepMs, startOfDay } from "@/lib/stats";
@@ -24,6 +29,7 @@ const TILES: EventType[] = ["sleep", "feed", "growth", "diaper"];
 export default function HomePage() {
   const t = useTranslations("home");
   const tAge = useTranslations("age");
+  const locale = useLocale();
   const { baby, babies, userDoc, events, moments, eventsReady, setActiveBaby, standalone, canInstall, promptInstall } = useApp();
   const tp = useTranslations("profile");
   const [installDismissed, setInstallDismissed] = useState(true);
@@ -50,6 +56,9 @@ export default function HomePage() {
   const running = useMemo(() => events.filter(isRunning), [events]);
   const lastTemp = useMemo(() => events.filter((e) => e.type === "temperature" && e.data.tempC != null).sort((a, b) => b.start - a.start)[0], [events]);
   const now = useNow(running.length > 0 || true, running.length ? 1000 : 30000);
+  // gentle estimates from the baby's own pattern
+  const nextFeed = useMemo(() => predictFeed(events, now), [events, now]);
+  const nextNap = useMemo(() => (baby ? predictNap(events, now, ageMonths(baby.birthDate, now, baby.gestationWeeks)) : null), [events, now, baby]);
 
   const stats = useMemo(() => {
     const d0 = startOfDay(now);
@@ -110,6 +119,7 @@ export default function HomePage() {
           </h1>
           <p className="text-sm font-medium text-soft">{t("babySub", { name: baby.name, age: ageText(baby.birthDate, tAge) })}</p>
         </div>
+        <StreakPill />
       </header>
 
       {babies && babies.length > 1 && (
@@ -145,6 +155,15 @@ export default function HomePage() {
             </span>
             <p className="mt-3 max-w-[16ch] text-[26px] font-extrabold leading-tight text-ink">{status}</p>
             {status2 && <p className="mt-1 text-sm font-semibold text-ink/70">{status2}</p>}
+            {(nextFeed || nextNap) && (
+              <p className="mt-2 flex items-center gap-1.5 text-sm font-semibold text-ink/65">
+                <Icon name="timeline" size={15} />
+                {[
+                  nextFeed && (nextFeed.at <= now ? t("predict.feedDue") : t("predict.feed", { time: clock(nextFeed.at, locale) })),
+                  nextNap && (nextNap.at <= now ? t("predict.napNow") : t("predict.nap", { time: clock(nextNap.at, locale) })),
+                ].filter(Boolean).join(" · ")}
+              </p>
+            )}
             {lastTemp && (
               // plain information, not a button: no background, a lighter tone
               <p className="mt-2 flex items-center gap-1.5 text-sm font-semibold text-ink/65">
@@ -155,6 +174,9 @@ export default function HomePage() {
           </div>
         </div>
       </WipeIn>
+
+      <OnThisDayCard />
+      <VitaminRow />
 
       {/* running timers */}
       {running.map((e) => {

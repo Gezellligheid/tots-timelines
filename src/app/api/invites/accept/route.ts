@@ -17,7 +17,7 @@ export async function POST(req: Request) {
       const user = (await tx.get(db.doc(`users/${uid}`))).data();
       tx.update(db.doc(`babies/${inv.babyId}`), {
         memberUids: FieldValue.arrayUnion(uid),
-        [`members.${uid}`]: { name: user?.displayName ?? "Parent", ...(user?.role ? { role: user.role } : {}) },
+        [`members.${uid}`]: { name: user?.displayName ?? "Parent", ...(user?.role ? { role: user.role } : {}), ...(user?.photoURL ? { photoURL: user.photoURL } : {}) },
       });
       tx.update(ref, { used: true, usedBy: uid, usedAt: Date.now() });
       return inv.babyId as string;
