@@ -143,7 +143,7 @@ export default function TimelinePage() {
     <div className="space-y-5 pt-2">
       <h1 className="text-3xl font-extrabold"><RevealText text={t("title")} /></h1>
       <div className="-mx-5 flex gap-2 overflow-x-auto px-5">
-        {(["all", "feed", "sleep", "diaper", "growth", "moment"] as Filter[]).map((f) => (
+        {(["all", "feed", "sleep", "diaper", "temperature", "growth", "moment"] as Filter[]).map((f) => (
           <Chip key={f} active={filter === f} onClick={() => setFilter(f)}>{t(f)}</Chip>
         ))}
       </div>

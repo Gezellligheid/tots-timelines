@@ -46,7 +46,7 @@ export interface Baby {
   wrappedPushedN?: number;
 }
 
-export type EventType = "feed" | "sleep" | "diaper" | "growth" | "moment";
+export type EventType = "feed" | "sleep" | "diaper" | "growth" | "moment" | "temperature";
 
 export interface EventData {
   method?: "breast" | "bottle" | "pump" | "solid";
@@ -61,6 +61,8 @@ export interface EventData {
   headCm?: number;
   milestone?: string; // key from lib/milestones
   title?: string; // custom title for a moment
+  tempC?: number; // temperature, always stored in °C
+  tempMethod?: "forehead" | "ear" | "armpit" | "rectal";
 }
 
 export interface EventDoc {

@@ -5,11 +5,12 @@ import { useApp } from "@/providers/Providers";
 import { Segmented, Skeleton } from "@/components/ui";
 import { Icon, type IconName } from "@/components/Icon";
 import { CountUp, RevealText, WipeIn } from "@/components/motion";
-import { Bars, GrowthChart, RhythmRing } from "@/components/charts";
+import { Bars, GrowthChart, RhythmRing, TempChart } from "@/components/charts";
 import { LogSheet } from "@/components/LogSheet";
 import { loadGrowth, ageMonths, sexKey, type GrowthMetric } from "@/lib/growth";
 import { DAY, dayKey, dayNightSleep, feedIntervals, fmtDur, longestSleep, sleepMs, startOfDay } from "@/lib/stats";
 import { gToLb, cmToIn, mlToOz } from "@/lib/units";
+import { fmtTemp } from "@/lib/temp";
 
 type Range = "day" | "week" | "month";
 
@@ -121,6 +122,9 @@ export default function InsightsPage() {
     </div>
   );
 
+  const temps = events
+    .filter((e) => e.type === "temperature" && e.data.tempC != null && e.start >= d0 - (days - 1) * DAY)
+    .sort((a, b) => a.start - b.start);
   const noData = !events.length;
 
   return (
@@ -164,6 +168,31 @@ export default function InsightsPage() {
             </div>
             {range !== "day" && <Bars data={calc.perDay.map((p) => ({ label: labelFor(p.k), parts: [{ v: p.wet, color: "var(--sky-ink)" }, { v: p.dirty, color: "var(--peach-ink)" }] }))} />}
           </Card>
+
+          {temps.length > 0 && (
+            <Card title={t("temperature")} tone="peach" icon="thermo">
+              <div className="mb-4 grid grid-cols-3 gap-2">
+                <div className="rounded-[22px] bg-surface2 p-3">
+                  <p className="text-xl font-extrabold tabular-nums">{fmtTemp(temps[temps.length - 1].data.tempC, units)}</p>
+                  <p className="text-xs font-semibold text-soft">{t("tempLatest")}</p>
+                </div>
+                <div className="rounded-[22px] bg-surface2 p-3">
+                  <p className="text-xl font-extrabold tabular-nums">{fmtTemp(Math.max(...temps.map((e) => e.data.tempC!)), units)}</p>
+                  <p className="text-xs font-semibold text-soft">{t("tempHighest")}</p>
+                </div>
+                <div className="rounded-[22px] bg-surface2 p-3">
+                  <p className="text-xl font-extrabold tabular-nums">{temps.length}</p>
+                  <p className="text-xs font-semibold text-soft">{t("tempReadings")}</p>
+                </div>
+              </div>
+              <TempChart
+                points={temps.map((e) => ({ t: e.start, c: e.data.tempC! }))}
+                units={units}
+                xLabels={[new Date(temps[0].start).toLocaleDateString(locale, { day: "numeric", month: "short" }), new Date(temps[temps.length - 1].start).toLocaleDateString(locale, { day: "numeric", month: "short" })]}
+              />
+              <p className="mt-2 text-xs text-soft">{t("tempFeverLine", { t: fmtTemp(38, units) })} {t("typicalNote")}</p>
+            </Card>
+          )}
 
           <Card title={t("rhythm")} tone="mint" icon="timeline">
             <RhythmRing events={events} />

@@ -159,13 +159,15 @@
       "sleep": "Slapen",
       "feed": "Voeding",
       "growth": "Groei",
-      "diaper": "Luier"
+      "diaper": "Luier",
+      "temperature": "Temperatuur"
     },
     "tileHint": {
       "sleep": "Start dutje",
       "feed": "Voeding loggen",
       "growth": "Meten",
-      "diaper": "Snel verschonen"
+      "diaper": "Snel verschonen",
+      "temperature": "Meten"
     },
     "running": {
       "sleep": "Slaapt",
@@ -186,7 +188,8 @@
       "feedGap": "Gemiddelde tijd tussen voedingen: {dur}",
       "dayNight": "{pct}% van de slaap is 's nachts",
       "welcome": "Log een paar momenten en we ontdekken het ritme van {name}."
-    }
+    },
+    "lastTemp": "Laatste temp {t} · {ago} geleden"
   },
   "log": {
     "feed": "Voeding",
@@ -243,7 +246,22 @@
     "minutes": "{m} min",
     "min": "min",
     "needOne": "Vul minstens één meting in",
-    "moment": "Moment"
+    "moment": "Moment",
+    "temperature": "Temperatuur",
+    "tempMethod": "Gemeten",
+    "tempNeed": "Scroll om een temperatuur in te stellen",
+    "tempFeverTip": "{t} of hoger is koorts. Bel bij baby's jonger dan 3 maanden direct de huisarts.",
+    "tempLowTip": "Onder {t} is te laag. Houd je baby warm en bel de huisarts als je je zorgen maakt.",
+    "temp": {
+      "forehead": "Voorhoofd",
+      "ear": "Oor",
+      "armpit": "Oksel",
+      "rectal": "Rectaal",
+      "low": "Laag",
+      "normal": "Normaal",
+      "raised": "Licht verhoogd",
+      "fever": "Koorts"
+    }
   },
   "timeline": {
     "title": "Tijdlijn",
@@ -269,7 +287,9 @@
     "details": "Details",
     "deleteQ": "Deze invoer verwijderen?",
     "week": "Week {n}",
-    "moment": "Momenten"
+    "moment": "Momenten",
+    "temperature": "Temperatuur",
+    "tempTitle": "Temperatuur"
   },
   "insights": {
     "title": "Hoe gaat het?",
@@ -316,7 +336,12 @@
     "growthEmpty": "Voeg een meting toe om {name} op de WHO-groeicurve te zien.",
     "addMeasurement": "Meting toevoegen",
     "ageMonths": "Leeftijd (maanden)",
-    "corrected": "Gecorrigeerde leeftijd gebruikt"
+    "corrected": "Gecorrigeerde leeftijd gebruikt",
+    "temperature": "Temperatuur",
+    "tempLatest": "laatste",
+    "tempHighest": "hoogste",
+    "tempReadings": "metingen",
+    "tempFeverLine": "Stippellijn: koorts vanaf {t}."
   },
   "profile": {
     "title": "Profiel",

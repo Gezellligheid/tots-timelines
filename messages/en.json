@@ -159,13 +159,15 @@
       "sleep": "Sleeping",
       "feed": "Feeding",
       "growth": "Growth",
-      "diaper": "Diaper"
+      "diaper": "Diaper",
+      "temperature": "Temperature"
     },
     "tileHint": {
       "sleep": "Start nap",
       "feed": "Log a feed",
       "growth": "Measure",
-      "diaper": "Quick change"
+      "diaper": "Quick change",
+      "temperature": "Take a reading"
     },
     "running": {
       "sleep": "Sleeping",
@@ -186,7 +188,8 @@
       "feedGap": "Average time between feeds: {dur}",
       "dayNight": "{pct}% of sleep happens at night",
       "welcome": "Log a few moments and we'll start spotting {name}'s rhythm."
-    }
+    },
+    "lastTemp": "Last temp {t} · {ago} ago"
   },
   "log": {
     "feed": "Feeding",
@@ -243,7 +246,22 @@
     "minutes": "{m} min",
     "min": "min",
     "needOne": "Enter at least one measurement",
-    "moment": "Moment"
+    "moment": "Moment",
+    "temperature": "Temperature",
+    "tempMethod": "Measured",
+    "tempNeed": "Scroll to set a temperature",
+    "tempFeverTip": "{t} or higher is a fever. For babies under 3 months, call your doctor right away.",
+    "tempLowTip": "Below {t} is low. Keep your baby warm and call your doctor if you're worried.",
+    "temp": {
+      "forehead": "Forehead",
+      "ear": "Ear",
+      "armpit": "Armpit",
+      "rectal": "Rectal",
+      "low": "Low",
+      "normal": "Normal",
+      "raised": "Slightly raised",
+      "fever": "Fever"
+    }
   },
   "timeline": {
     "title": "Timeline",
@@ -269,7 +287,9 @@
     "details": "Details",
     "deleteQ": "Delete this entry?",
     "week": "Week {n}",
-    "moment": "Moments"
+    "moment": "Moments",
+    "temperature": "Temperature",
+    "tempTitle": "Temperature"
   },
   "insights": {
     "title": "How is it going?",
@@ -316,7 +336,12 @@
     "growthEmpty": "Add a measurement to see {name} on the WHO growth curve.",
     "addMeasurement": "Add measurement",
     "ageMonths": "Age (months)",
-    "corrected": "Corrected age used"
+    "corrected": "Corrected age used",
+    "temperature": "Temperature",
+    "tempLatest": "latest",
+    "tempHighest": "highest",
+    "tempReadings": "readings",
+    "tempFeverLine": "Dashed line: fever at {t}."
   },
   "profile": {
     "title": "Profile",

@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Icon, type IconName } from "./Icon";
 import { EASE } from "./motion";
 import { MeasureWheel } from "./Wheel";
@@ -51,13 +51,53 @@ export function ChoiceCard({ selected, onSelect, tone, icon, label, sub, compact
   );
 }
 
+/** − / + stepper. A tap changes the value by one step; holding the button keeps repeating it. */
 export function Stepper({ value, min, max, step = 1, onChange, format }: { value: number; min: number; max: number; step?: number; onChange: (v: number) => void; format?: (v: number) => string }) {
-  const set = (v: number) => onChange(Math.min(max, Math.max(min, +(v).toFixed(2))));
+  const latest = useRef(value);
+  latest.current = value;
+  const timers = useRef<{ wait?: ReturnType<typeof setTimeout>; repeat?: ReturnType<typeof setInterval> }>({});
+
+  const stop = () => {
+    clearTimeout(timers.current.wait);
+    clearInterval(timers.current.repeat);
+  };
+  useEffect(() => stop, []);
+
+  const bump = (dir: 1 | -1) => {
+    const next = Math.min(max, Math.max(min, +(latest.current + dir * step).toFixed(2)));
+    latest.current = next;
+    onChange(next);
+  };
+  const press = (dir: 1 | -1) => {
+    stop();
+    bump(dir);
+    timers.current.wait = setTimeout(() => {
+      timers.current.repeat = setInterval(() => bump(dir), 110);
+    }, 450);
+  };
+  const holdProps = (dir: 1 | -1) => ({
+    onPointerDown: (e: React.PointerEvent) => {
+      e.preventDefault();
+      press(dir);
+    },
+    onPointerUp: stop,
+    onPointerLeave: stop,
+    onPointerCancel: stop,
+    onContextMenu: (e: React.MouseEvent) => e.preventDefault(),
+    onKeyDown: (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        bump(dir);
+      }
+    },
+    style: { touchAction: "manipulation", userSelect: "none", WebkitTouchCallout: "none" } as React.CSSProperties,
+  });
+
   return (
     <div className="flex items-center justify-between rounded-full bg-surface p-1.5 shadow-[var(--shadow)]">
-      <button type="button" className="glass-btn !h-12 !w-12 text-2xl font-bold" onClick={() => set(value - step)} aria-label="−">−</button>
+      <button type="button" className="glass-btn !h-12 !w-12 text-2xl font-bold" aria-label="−" {...holdProps(-1)}>−</button>
       <span className="text-xl font-extrabold tabular-nums">{format ? format(value) : value}</span>
-      <button type="button" className="glass-btn !h-12 !w-12 text-2xl font-bold" onClick={() => set(value + step)} aria-label="+">+</button>
+      <button type="button" className="glass-btn !h-12 !w-12 text-2xl font-bold" aria-label="+" {...holdProps(1)}>+</button>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { useMomentTitle } from "./MomentCard";
 import { clock } from "@/lib/format";
 import { fmtDur, duration } from "@/lib/stats";
 import { fmtLength, fmtVolume, fmtWeight } from "@/lib/units";
+import { fmtTemp } from "@/lib/temp";
 import type { EventDoc, Units } from "@/lib/types";
 
 export function useDescribe(units: Units) {
@@ -34,6 +35,8 @@ export function useDescribe(units: Units) {
         const title = tt(d.kind === "dirty" ? "diaperDirty" : d.kind === "mixed" ? "diaperMixed" : "diaperWet");
         return { title, sub: d.color ? tl(`color.${d.color}`) : "" };
       }
+      case "temperature":
+        return { title: tt("tempTitle"), sub: [fmtTemp(d.tempC, units), d.tempMethod ? tl(`temp.${d.tempMethod}`) : ""].filter(Boolean).join(" · ") };
       case "moment":
         return { title: momentTitle(e), sub: e.note ?? "" };
       default:

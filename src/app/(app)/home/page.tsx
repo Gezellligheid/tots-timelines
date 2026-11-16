@@ -10,6 +10,7 @@ import { BabyAvatar, useNow } from "@/components/ui";
 import { LogSheet } from "@/components/LogSheet";
 import { EventRow, useDescribe } from "@/components/EventRow";
 import { WrappedCard } from "@/components/WrappedGate";
+import { fmtTemp } from "@/lib/temp";
 import { FeedReminderPill } from "@/components/FeedReminder";
 import { Donut } from "@/components/charts";
 import { ageText } from "@/lib/format";
@@ -39,7 +40,7 @@ export default function HomePage() {
   useEffect(() => {
     try {
       const p = new URLSearchParams(window.location.search).get("log");
-      if (!p || !["feed", "sleep", "diaper", "growth", "moment"].includes(p)) return;
+      if (!p || !["feed", "sleep", "diaper", "growth", "moment", "temperature"].includes(p)) return;
       window.history.replaceState(null, "", "/home");
       setClosing(false);
       setSheet({ type: p as EventType, origin: { x: window.innerWidth / 2, y: window.innerHeight } });
@@ -47,6 +48,7 @@ export default function HomePage() {
   }, []);
 
   const running = useMemo(() => events.filter(isRunning), [events]);
+  const lastTemp = useMemo(() => events.filter((e) => e.type === "temperature" && e.data.tempC != null).sort((a, b) => b.start - a.start)[0], [events]);
   const now = useNow(running.length > 0 || true, running.length ? 1000 : 30000);
 
   const stats = useMemo(() => {
@@ -143,6 +145,12 @@ export default function HomePage() {
             </span>
             <p className="mt-3 max-w-[16ch] text-[26px] font-extrabold leading-tight text-ink">{status}</p>
             {status2 && <p className="mt-1 text-sm font-semibold text-ink/70">{status2}</p>}
+            {lastTemp && (
+              // plain information, not a button: no background, a lighter tone
+              <p className="mt-2 flex items-center gap-1.5 text-sm font-semibold text-ink/65">
+                <Icon name="thermo" size={15} /> {t("lastTemp", { t: fmtTemp(lastTemp.data.tempC, units), ago: fmtAgo(now - lastTemp.start) })}
+              </p>
+            )}
             <FeedReminderPill />
           </div>
         </div>
@@ -195,21 +203,28 @@ export default function HomePage() {
         })}
       </section>
 
-      <motion.button
-        onClick={(e) => open("moment", e)}
-        initial={{ clipPath: "circle(0% at 50% 100%)" }}
-        animate={{ clipPath: "circle(150% at 50% 100%)" }}
-        transition={{ duration: 0.9, ease: EASE, delay: 0.45 }}
-        whileTap={{ scale: 0.98 }}
-        className="relative flex w-full items-center gap-4 overflow-hidden rounded-[30px] bg-sky p-4 pr-5 text-left"
-      >
-        <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-surface text-sky-ink"><Icon name="star" size={30} strokeWidth={1.8} /></span>
-        <span className="flex-1">
-          <span className="block text-xl font-extrabold">{tm("tile")}</span>
-          <span className="block text-xs font-semibold text-ink/60">{tm("tileHint")}</span>
-        </span>
-        <span className="grid h-11 w-11 place-items-center rounded-full bg-surface/80"><Icon name="arrowUR" size={20} /></span>
-      </motion.button>
+      <section className="grid grid-cols-2 gap-4">
+        {([
+          ["temperature", "thermo", t("tile.temperature"), t("tileHint.temperature"), "peach"],
+          ["moment", "star", tm("tile"), tm("tileHint"), "sky"],
+        ] as const).map(([type, icon, title, hint, tone], i) => (
+          <motion.button
+            key={type}
+            onClick={(e) => open(type as EventType, e)}
+            initial={{ clipPath: "circle(0% at 50% 100%)" }}
+            animate={{ clipPath: "circle(150% at 50% 100%)" }}
+            transition={{ duration: 0.9, ease: EASE, delay: 0.45 + i * 0.08 }}
+            whileTap={{ scale: 0.97 }}
+            className={`relative flex items-center gap-3 overflow-hidden rounded-[26px] bg-${tone} p-3.5 text-left`}
+          >
+            <span className={`grid h-12 w-12 shrink-0 place-items-center rounded-full bg-surface text-${tone}-ink`}><Icon name={icon} size={26} strokeWidth={1.8} /></span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-base font-extrabold">{title}</span>
+              <span className="block truncate text-[11px] font-semibold text-ink/60">{hint}</span>
+            </span>
+          </motion.button>
+        ))}
+      </section>
 
       {/* today */}
       <section>

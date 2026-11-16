@@ -7,6 +7,7 @@ const SHORTCUTS = {
     sleep: ["Start sleeping", "Sleep"],
     diaper: ["Log a diaper", "Diaper"],
     moment: ["Add a memory", "Memory"],
+    temperature: ["Log temperature", "Temp"],
     growth: ["Log growth", "Growth"],
   },
   nl: {
@@ -14,6 +15,7 @@ const SHORTCUTS = {
     sleep: ["Start slapen", "Slapen"],
     diaper: ["Luier loggen", "Luier"],
     moment: ["Herinnering toevoegen", "Herinnering"],
+    temperature: ["Temperatuur meten", "Temp."],
     growth: ["Groei loggen", "Groei"],
   },
 } as const;
@@ -46,7 +48,7 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
     ],
     // Long-press (Android) or right-click (desktop) the installed app icon for quick actions.
     // Android launchers show the first 4, desktop shows all.
-    shortcuts: (["feed", "sleep", "diaper", "moment", "growth"] as const).map((k) => ({
+    shortcuts: (["feed", "sleep", "diaper", "moment", "temperature", "growth"] as const).map((k) => ({
       name: names[k][0],
       short_name: names[k][1],
       url: `/home?log=${k}`,

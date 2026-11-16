@@ -4,7 +4,8 @@ import { useId, useMemo } from "react";
 import { EASE } from "./motion";
 import { valueAtZ, Z } from "@/lib/growth";
 import { HOUR, MIN, startOfDay } from "@/lib/stats";
-import type { EventDoc } from "@/lib/types";
+import type { EventDoc, Units } from "@/lib/types";
+import { cToF } from "@/lib/temp";
 
 /* ---------- Donut with a sweeping mask reveal ---------- */
 export function Donut({ segments, big, small, size = 156 }: { segments: { value: number; color: string }[]; big: string; small: string; size?: number }) {
@@ -154,3 +155,41 @@ export function GrowthChart({ rows, points, maxMonth, convert = (v: number) => v
 }
 
 export const MIN_MS = MIN;
+
+/* ---------- temperature readings over time, with the fever line ---------- */
+export function TempChart({ points, units, xLabels }: { points: { t: number; c: number }[]; units: Units; xLabels: [string, string] }) {
+  const id = useId();
+  const W = 320, H = 170, pl = 38, pr = 10, pt = 12, pb = 24;
+  const imp = units === "imperial";
+  const u = (c: number) => (imp ? cToF(c) : c);
+  const vals = points.map((p) => u(p.c));
+  const yMin = Math.floor(Math.min(imp ? 96 : 36, ...vals) - 0.2), yMax = Math.ceil(Math.max(imp ? 102 : 39, ...vals) + 0.2);
+  const t0 = points[0].t, t1 = points[points.length - 1].t === t0 ? t0 + 86400000 : points[points.length - 1].t;
+  const x = (t: number) => pl + ((t - t0) / (t1 - t0)) * (W - pl - pr);
+  const y = (v: number) => pt + (1 - (v - yMin) / (yMax - yMin)) * (H - pt - pb);
+  const fever = u(38);
+  const ticks = [0, 1, 2, 3].map((i) => yMin + ((yMax - yMin) * i) / 3);
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full">
+      <defs>
+        <clipPath id={id}>
+          <motion.rect x={0} y={0} height={H} initial={{ width: 0 }} animate={{ width: W }} transition={{ duration: 1.2, ease: EASE }} />
+        </clipPath>
+      </defs>
+      {ticks.map((tk, i) => (
+        <g key={i}>
+          <line x1={pl} x2={W - pr} y1={y(tk)} y2={y(tk)} stroke="var(--line)" />
+          <text x={pl - 6} y={y(tk) + 3} textAnchor="end" fontSize="8" fontWeight="600" fill="var(--soft)">{+tk.toFixed(1)}</text>
+        </g>
+      ))}
+      <g clipPath={`url(#${id})`}>
+        <rect x={pl} y={pt} width={W - pl - pr} height={Math.max(0, y(fever) - pt)} fill="var(--blush)" opacity={0.55} />
+        <line x1={pl} x2={W - pr} y1={y(fever)} y2={y(fever)} stroke="var(--blush-ink)" strokeWidth={1.2} strokeDasharray="4 3" />
+        {points.length > 1 && <path d={points.map((p, i) => `${i ? "L" : "M"}${x(p.t)} ${y(u(p.c))}`).join(" ")} fill="none" stroke="var(--ink)" strokeWidth={1.6} strokeLinejoin="round" strokeLinecap="round" opacity={0.6} />}
+        {points.map((p, i) => <circle key={i} cx={x(p.t)} cy={y(u(p.c))} r={4.5} fill={p.c >= 38 ? "var(--blush-ink)" : "var(--ink)"} stroke="var(--surface)" strokeWidth={2} />)}
+      </g>
+      <text x={pl} y={H - 8} fontSize="8" fontWeight="600" fill="var(--soft)">{xLabels[0]}</text>
+      <text x={W - pr} y={H - 8} textAnchor="end" fontSize="8" fontWeight="600" fill="var(--soft)">{xLabels[1]}</text>
+    </svg>
+  );
+}

@@ -91,8 +91,11 @@ body {
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
 }
-button { cursor: pointer; font: inherit; color: inherit; }
-input, textarea, select { font: inherit; color: inherit; }
+/* In the base layer, so Tailwind utilities (text-sm, font-bold, text-soft …) on buttons and inputs still win */
+@layer base {
+  button { cursor: pointer; font: inherit; color: inherit; }
+  input, textarea, select { font: inherit; color: inherit; }
+}
 * { scrollbar-width: none; }
 *::-webkit-scrollbar { display: none; }
 

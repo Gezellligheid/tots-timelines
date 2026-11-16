@@ -126,15 +126,17 @@ export function FeedReminderPill() {
     <>
       <button
         type="button"
-        className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-surface/70 px-3 py-1.5 text-xs font-bold"
+        // a clear button: solid white, soft shadow, chevron, and it presses in
+        className="mt-3 inline-flex items-center gap-2 rounded-full bg-surface py-2 pl-3.5 pr-2.5 text-sm font-bold text-ink shadow-[var(--shadow)] transition-transform active:scale-[.97]"
         onClick={(e) => {
           const r = e.currentTarget.getBoundingClientRect();
           setOrigin({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
           setOpen(true);
         }}
       >
-        <Icon name="bell" size={14} />
+        <Icon name="bell" size={16} />
         {on ? t("pill", { h: feedReminder?.intervalHours ?? 3 }) : t("pillOff")}
+        <Icon name="chevR" size={14} className="opacity-50" />
       </button>
       <ReminderSheet open={open} onClose={() => setOpen(false)} origin={origin} />
     </>

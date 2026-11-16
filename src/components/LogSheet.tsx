@@ -10,6 +10,8 @@ import { addEvent } from "@/lib/data";
 import { uploadPhoto } from "@/lib/media";
 import { MILESTONES } from "@/lib/milestones";
 import { TakePhotoButton } from "./CameraSheet";
+import { TempWheel } from "./Wheel";
+import { fmtTemp, tempStatus } from "@/lib/temp";
 import { TYPE_META } from "@/lib/meta";
 import { DateTimeField } from "./DatePicker";
 import { MIN } from "@/lib/stats";
@@ -74,6 +76,10 @@ function Body({ type, onClose }: { type: EventType; onClose: () => void }) {
   const [lCm, setLCm] = useState<number | undefined>();
   const [hCm, setHCm] = useState<number | undefined>();
   const [pcts, setPcts] = useState<Partial<Record<GrowthMetric, number>>>({});
+
+  // temperature
+  const [tempC, setTempC] = useState<number | undefined>();
+  const [tempMethod, setTempMethod] = useState<"forehead" | "ear" | "armpit" | "rectal">("forehead");
 
   // moment
   const [mmode, setMmode] = useState<"milestone" | "memory">("milestone");
@@ -147,6 +153,12 @@ function Body({ type, onClose }: { type: EventType; onClose: () => void }) {
     done();
   };
 
+  const saveTemp = () => {
+    if (tempC == null) return toast(t("tempNeed"));
+    addEvent(baby.id, { type: "temperature", start: when, end: when, data: { tempC, tempMethod }, note: trimNote });
+    done();
+  };
+
   const saveMoment = async () => {
     const isMs = mmode === "milestone";
     const title = mTitle.trim();
@@ -169,7 +181,8 @@ function Body({ type, onClose }: { type: EventType; onClose: () => void }) {
     }
   };
 
-  const mlStep = units === "imperial" ? 29.5735 / 2 : 10;
+  // bottle amounts move in 5 ml steps (half an ounce for imperial)
+  const mlStep = units === "imperial" ? 29.5735 / 2 : 5;
   const mlFmt = (v: number) => (units === "imperial" ? `${mlToOz(v).toFixed(1)} oz` : `${Math.round(v)} ml`);
 
   const timePicker = (
@@ -220,7 +233,7 @@ function Body({ type, onClose }: { type: EventType; onClose: () => void }) {
           {(method === "bottle" || method === "pump") && (
             <div>
               <p className="mb-2 px-1 text-sm font-bold text-soft">{t("amount")}</p>
-              <Stepper value={ml} min={10} max={400} step={mlStep} onChange={setMl} format={mlFmt} />
+              <Stepper value={ml} min={5} max={400} step={mlStep} onChange={setMl} format={mlFmt} />
             </div>
           )}
           {method === "bottle" && (
@@ -323,6 +336,24 @@ function Body({ type, onClose }: { type: EventType; onClose: () => void }) {
         </>
       )}
 
+      {type === "temperature" && (
+        <>
+          <TempWheel units={units} valueC={tempC} onChange={setTempC} />
+          {tempC != null && <TempStatusNote c={tempC} units={units} />}
+          <div>
+            <p className="mb-2 px-1 text-sm font-bold text-soft">{t("tempMethod")}</p>
+            <div className="flex flex-wrap gap-2">
+              {(["forehead", "ear", "armpit", "rectal"] as const).map((m) => (
+                <Chip key={m} active={tempMethod === m} onClick={() => setTempMethod(m)}>{t(`temp.${m}`)}</Chip>
+              ))}
+            </div>
+          </div>
+          {timePicker}
+          {noteField}
+          <button className="pill-btn w-full" disabled={tempC == null} onClick={saveTemp}>{tc("save")}</button>
+        </>
+      )}
+
       {type === "moment" && (
         <>
           <div className="flex gap-2">
@@ -362,6 +393,22 @@ function Body({ type, onClose }: { type: EventType; onClose: () => void }) {
           <button className="pill-btn w-full" disabled={busy} onClick={saveMoment}>{busy ? tm("saving") : tc("save")}</button>
         </>
       )}
+    </div>
+  );
+}
+
+/** Plain-language read of a reading, with the standard guidance for a fever. Guidance only, not a diagnosis. */
+function TempStatusNote({ c, units }: { c: number; units: "metric" | "imperial" }) {
+  const t = useTranslations("log");
+  const st = tempStatus(c);
+  const tone = { fever: "blush", raised: "butter", normal: "mint", low: "sky" }[st];
+  return (
+    <div className={`rounded-[20px] bg-${tone} p-3.5 px-4`}>
+      <p className={`flex items-center gap-2 text-sm font-extrabold text-${tone}-ink`}>
+        <Icon name="thermo" size={16} /> {t(`temp.${st}`)} · {fmtTemp(c, units)}
+      </p>
+      {st === "fever" && <p className="mt-1 text-sm font-medium">{t("tempFeverTip", { t: fmtTemp(38, units) })}</p>}
+      {st === "low" && <p className="mt-1 text-sm font-medium">{t("tempLowTip", { t: fmtTemp(36, units) })}</p>}
     </div>
   );
 }

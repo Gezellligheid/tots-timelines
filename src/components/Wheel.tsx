@@ -96,3 +96,43 @@ export function MeasureWheel({ valueCm, onChange, units, kind }: { valueCm?: num
     </div>
   );
 }
+
+const TEMP_RANGE = { metric: [34, 42, 37, 0], imperial: [93, 108, 98, 6] } as const; // min, max, default whole, default tenth
+
+/** Whole degrees + tenths wheels (°C or °F). The value is reported in °C, and stays undefined until the user scrolls. */
+export function TempWheel({ valueC, onChange, units }: { valueC?: number; onChange: (c?: number) => void; units: "metric" | "imperial" }) {
+  const tc = useTranslations("common");
+  const [min, max, defWhole, defTenth] = TEMP_RANGE[units];
+  const imp = units === "imperial";
+  const start = valueC != null ? (imp ? (valueC * 9) / 5 + 32 : valueC) : null;
+  const startWhole = start != null ? Math.min(max, Math.max(min, Math.floor(start + 1e-6))) : defWhole;
+  const [whole, setWhole] = useState(startWhole - min);
+  const [tenth, setTenth] = useState(start != null ? Math.min(9, Math.round((start - Math.floor(start + 1e-6)) * 10)) : defTenth);
+  const [touched, setTouched] = useState(valueC != null);
+
+  const emit = (w: number, t: number) => {
+    const v = min + w + t / 10;
+    const c = imp ? ((v - 32) * 5) / 9 : v;
+    onChange(Math.round(c * 10) / 10);
+  };
+  const ints = Array.from({ length: max - min + 1 }, (_, i) => String(min + i));
+  const tenths = Array.from({ length: 10 }, (_, i) => String(i));
+
+  return (
+    <div>
+      <div className={`flex items-center gap-1 rounded-[28px] bg-surface p-2 shadow-[var(--shadow)] transition-opacity duration-500 ${touched ? "" : "opacity-70"}`}>
+        <WheelColumn items={ints} index={whole} dim={!touched} onChange={(i) => { setWhole(i); setTouched(true); emit(i, tenth); }} />
+        <span className="pb-1 text-2xl font-extrabold">.</span>
+        <WheelColumn items={tenths} index={tenth} dim={!touched} onChange={(i) => { setTenth(i); setTouched(true); emit(whole, i); }} />
+        <span className="w-12 text-center text-lg font-bold text-soft">{imp ? "°F" : "°C"}</span>
+      </div>
+      <div className="mt-2 flex h-8 items-center justify-center">
+        {touched ? (
+          <button type="button" className="text-sm font-bold text-soft underline underline-offset-4" onClick={() => { setTouched(false); onChange(undefined); }}>{tc("clear")}</button>
+        ) : (
+          <span className="text-sm font-semibold text-soft">{tc("scrollToSet")}</span>
+        )}
+      </div>
+    </div>
+  );
+}
